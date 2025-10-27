@@ -3,121 +3,195 @@
 @theme {
   /* Font Families */
   --font-family-display: "Baloo 2", cursive;
-  --font-family-body: "Nunito Sans", sans-serif;
+  --font-family-body: "Inter", sans-serif;
 
-  /* Linera Color Palette */
-  --color-linera-50: #fff1ee;
-  --color-linera-100: #ffe3dd;
-  --color-linera-200: #ffc7bb;
-  --color-linera-300: #ffab99;
-  --color-linera-400: #ff6f55;
-  --color-linera-500: #de2a02;
-  --color-linera-600: #c22502;
-  --color-linera-700: #a11f02;
-  --color-linera-800: #7d1801;
-  --color-linera-900: #5c1201;
+  /* Premium Dark Gaming Palette */
+  --color-void-950: #0a0a0f;
+  --color-void-900: #13131a;
+  --color-void-800: #1c1c26;
+  --color-void-700: #252533;
+  --color-void-600: #34344a;
 
-  /* Dark Color Palette */
-  --color-dark-950: #0a0a0b;
-  --color-dark-900: #111113;
-  --color-dark-800: #1a1a1d;
-  --color-dark-700: #242428;
-  --color-dark-600: #35353a;
+  /* Premium Red/Orange Accent (Linera-inspired) */
+  --color-ember-50: #fff5f2;
+  --color-ember-100: #ffe4db;
+  --color-ember-200: #ffc4b3;
+  --color-ember-300: #ff9e80;
+  --color-ember-400: #ff6b4a;
+  --color-ember-500: #ff3d1f;
+  --color-ember-600: #e62912;
+  --color-ember-700: #c01f0d;
+  --color-ember-800: #991a0f;
+  --color-ember-900: #7d1912;
 
-  /* Accent Colors */
-  --color-accent-blue: #3b82f6;
-  --color-accent-purple: #a855f7;
-  --color-accent-green: #10b981;
-  --color-accent-yellow: #fbbf24;
+  /* Soft Accents for Cards */
+  --color-azure: #60a5fa;
+  --color-jade: #34d399;
+  --color-amber: #fbbf24;
+  --color-amethyst: #c084fc;
+  --color-rose: #fb7185;
+
+  /* Glass Effect Colors */
+  --color-glass-light: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
 }
 
-/* Landscape orientation restriction for small screens */
-@media screen and (max-height: 600px) and (orientation: portrait) {
-  body::before {
-    content: "Please rotate your device to landscape mode for the best gaming experience";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #0a0a0b, #111113);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Nunito Sans", sans-serif;
-    font-size: 1.2rem;
-    text-align: center;
-    padding: 2rem;
-    z-index: 9999;
-  }
+/* Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
   font-family: var(--font-family-body);
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.9);
+  background-color: #0a0a0f;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow: hidden;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Landscape Mode Enforcement for Mobile */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  body::before {
+    content: "📱 Please rotate your device";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0a0a0f, #13131a);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-display);
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+    z-index: 99999;
+    gap: 1rem;
+  }
+
+  body::after {
+    content: "This game is best played in landscape mode";
+    position: fixed;
+    top: 55%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    z-index: 99999;
+    padding: 0 2rem;
+  }
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar-track {
+  background: var(--color-void-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-ember-600);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ember-500);
+}
+
+/* Glass Morphism Effect */
+.glass {
+  background: var(--color-glass-light);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--color-glass-border);
+}
+
+/* Glow Effects */
+.glow-ember {
+  box-shadow: 0 0 20px rgba(255, 61, 31, 0.3),
+              0 0 40px rgba(255, 61, 31, 0.1);
+}
+
+.glow-ember-strong {
+  box-shadow: 0 0 30px rgba(255, 61, 31, 0.5),
+              0 0 60px rgba(255, 61, 31, 0.2),
+              0 0 90px rgba(255, 61, 31, 0.1);
+}
+
+/* Card Table Texture */
+.felt-texture {
+  background: 
+    linear-gradient(135deg, #1c1c26 0%, #13131a 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.01) 10px,
+      rgba(255, 255, 255, 0.01) 20px
+    );
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 61, 31, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(255, 61, 31, 0.6); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Card Hover Effect */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-20px) scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
