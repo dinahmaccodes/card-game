@@ -2,4 +2,4 @@
 
 Link to Live Demo V1:
 
-`linot.vercel.app`
+<https://linot.vercel.app>
