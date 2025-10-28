@@ -1,5 +1,4 @@
 import React from "react";
-import { motion } from "framer-motion";
 import type { CardProps } from "../types/game";
 
 const CardComponent: React.FC<CardProps> = ({
@@ -9,146 +8,180 @@ const CardComponent: React.FC<CardProps> = ({
   onClick,
   className = "",
 }) => {
-  const getSuitSymbol = (suit: string) => {
+  const getSuitSVG = (suit: string) => {
     switch (suit) {
       case "circle":
-        return "●";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="40" fill="currentColor" />
+          </svg>
+        );
       case "triangle":
-        return "▲";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <polygon points="50,10 90,90 10,90" fill="currentColor" />
+          </svg>
+        );
       case "square":
-        return "■";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <rect x="20" y="20" width="60" height="60" fill="currentColor" />
+          </svg>
+        );
       case "star":
-        return "★";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <polygon
+              points="50,10 61,35 88,35 67,52 77,78 50,60 23,78 33,52 12,35 39,35"
+              fill="currentColor"
+            />
+          </svg>
+        );
       case "cross":
-        return "✚";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <rect x="40" y="10" width="20" height="80" fill="currentColor" />
+            <rect x="10" y="40" width="80" height="20" fill="currentColor" />
+          </svg>
+        );
       case "whot":
-        return "W";
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle
+              cx="50"
+              cy="50"
+              r="35"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="8"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="8"
+            />
+            <circle cx="50" cy="50" r="5" fill="currentColor" />
+          </svg>
+        );
       default:
-        return "?";
+        return null;
     }
   };
 
   const getSuitColor = (suit: string) => {
     switch (suit) {
       case "circle":
-        return "text-linera-500";
+        return "text-azure";
       case "triangle":
-        return "text-linera-900";
+        return "text-jade";
       case "square":
-        return "text-accent-green";
+        return "text-amber";
       case "star":
-        return "text-accent-yellow";
+        return "text-amethyst";
       case "cross":
-        return "text-accent-purple";
+        return "text-rose";
       case "whot":
-        return "text-linera-600";
+        return "text-ember-500";
       default:
         return "text-gray-500";
     }
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.8, rotateY: -90 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      transition: { duration: 0.3 },
-    },
-    hover: {
-      scale: 1.05,
-      y: -20,
-      transition: { duration: 0.2 },
-    },
-    tap: {
-      scale: 0.95,
-      transition: { duration: 0.1 },
-    },
-  };
-
+  // Card Back Design
   if (!isFaceUp) {
     return (
-      <motion.div
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className={`
-          w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-36 lg:w-32 lg:h-44
-          bg-linear-to-br from-dark-800 to-dark-900 
-          border-2 border-linera-500 rounded-xl shadow-lg
-          flex items-center justify-center
+          w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-32 lg:w-28 lg:h-40
+          relative rounded-xl shadow-lg
           ${className}
         `}
       >
-        <div className="text-linera-500 text-2xl sm:text-3xl md:text-4xl font-bold">
-          ?
+        <div className="absolute inset-0 bg-linear-to-br from-ember-600 via-ember-700 to-ember-900 rounded-xl border-2 border-ember-500/30">
+          <div className="absolute inset-[3px] bg-linear-to-br from-void-800 to-void-900 rounded-lg flex items-center justify-center">
+            <div className="text-ember-500/30 text-2xl font-bold">L</div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
+  // Card Front Design
   return (
-    <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      whileHover={isPlayable ? "hover" : undefined}
-      whileTap={isPlayable ? "tap" : undefined}
+    <div
       onClick={isPlayable ? onClick : undefined}
       className={`
-        w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-36 lg:w-32 lg:h-44
-        bg-white rounded-xl shadow-lg border-2
-        flex flex-col items-center justify-between p-2 sm:p-3
-        ${
-          isPlayable
-            ? "cursor-pointer border-linera-500 hover:border-linera-400 hover:shadow-2xl"
-            : "border-gray-300 opacity-50"
-        }
-        ${className}
+        w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-32 lg:w-28 lg:h-40
+          bg-white rounded-xl shadow-2xl overflow-hidden
+      relative
+      ${
+        isPlayable
+          ? "cursor-pointer hover:translate-x-6 hover:shadow-2xl"
+          : "opacity-100"
+      }
+      ${isPlayable ? "border-2 border-ember-400" : "border border-gray-300"}
+      transition-all duration-200
+      ${className}
       `}
     >
-      {/* Top-left number and suit */}
-      <div className="flex flex-col items-start w-full">
+      {/* Card Background */}
+      {/* Top Corner */}
+      <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col items-center gap-0.5">
         <div
-          className={`text-xs sm:text-sm md:text-base font-bold ${getSuitColor(
+          className={`text-sm sm:text-lg md:text-xl font-bold ${getSuitColor(
             card.suit
           )}`}
         >
           {card.number}
         </div>
-        <div className={`text-xs sm:text-sm ${getSuitColor(card.suit)}`}>
-          {getSuitSymbol(card.suit)}
+        <div
+          className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ${getSuitColor(
+            card.suit
+          )}`}
+        >
+          {getSuitSVG(card.suit)}
         </div>
       </div>
 
-      {/* Center suit symbol */}
-      <div
-        className={`text-lg sm:text-xl md:text-2xl lg:text-3xl ${getSuitColor(
-          card.suit
-        )}`}
-      >
-        {getSuitSymbol(card.suit)}
+      {/* Center Symbol */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className={`w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 ${getSuitColor(
+            card.suit
+          )}`}
+        >
+          {getSuitSVG(card.suit)}
+        </div>
       </div>
 
-      {/* Bottom-right number and suit (rotated) */}
-      <div className="flex flex-col items-end w-full transform rotate-180">
+      {/* Bottom Corner (Rotated) */}
+      <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 flex flex-col items-center gap-0.5 rotate-180">
         <div
-          className={`text-xs sm:text-sm md:text-base font-bold ${getSuitColor(
+          className={`text-sm sm:text-lg md:text-xl font-bold ${getSuitColor(
             card.suit
           )}`}
         >
           {card.number}
         </div>
-        <div className={`text-xs sm:text-sm ${getSuitColor(card.suit)}`}>
-          {getSuitSymbol(card.suit)}
+        <div
+          className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 ${getSuitColor(
+            card.suit
+          )}`}
+        >
+          {getSuitSVG(card.suit)}
         </div>
       </div>
 
-      {/* Special card indicator */}
+      {/* Special Card Indicator */}
       {card.isSpecial && (
-        <div className="absolute top-1 right-1 w-2 h-2 bg-linera-500 rounded-full"></div>
+        <div className="absolute top-1 right-1">
+          <div className="w-2 h-2 bg-ember-500 rounded-full" />
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

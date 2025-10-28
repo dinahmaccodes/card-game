@@ -1,13 +1,17 @@
 import { create } from "zustand";
-import type { GameState, Player } from "../types/game";
+import type { GameState, Player} from "../types/game";
 import {
   createDeck,
   dealCards,
-  canPlayCard,
+  validateCardPlay,
   isGameOver,
   getNextPlayerIndex,
-  handleSpecialCard,
+  applySpecialCardEffect,
+  applyGeneralMarket,
+  applyPickPenalty,
   getComputerMove,
+  drawCards,
+  reshuffleDiscardPile,
 } from "../lib/gameLogic";
 import toast from "react-hot-toast";
 
@@ -40,7 +44,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cardsToDraw: 0,
   pendingPenalty: 0,
   whotShapeDemand: undefined,
-  canEndTurn: true,
+  canEndTurn: false,
+  awaitingHoldOnCard: false,
+  awaitingSuspensionCard: false,
 
   // Actions
   startNewGame: () => {
@@ -62,8 +68,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       cardsToDraw: 0,
       pendingPenalty: 0,
       whotShapeDemand: undefined,
-      canEndTurn: true,
+      canEndTurn: false,
       turnDirection: "clockwise",
+      awaitingHoldOnCard: false,
+      awaitingSuspensionCard: false,
     });
 
     toast.success("New game started! You go first.");
@@ -78,10 +86,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    if (
-      state.currentPlayerIndex !==
-      state.players.findIndex((p) => p.id === playerId)
-    ) {
+    const playerIndex = state.players.findIndex((p) => p.id === playerId);
+    if (state.currentPlayerIndex !== playerIndex) {
       toast.error("Not your turn!");
       return;
     }
@@ -94,8 +100,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const card = player.hand[cardIndex];
 
-    if (!canPlayCard(card, state.lastPlayedCard, state.whotShapeDemand)) {
-      toast.error("Cannot play this card! Match the shape or number.");
+    // VALIDATE CARD PLAY with detailed error messages
+    const validation = validateCardPlay(card, state);
+    if (!validation.valid) {
+      toast.error(validation.reason || "Invalid card play!");
       return;
     }
 
@@ -110,7 +118,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Check for "Last Card" notification
     if (newHand.length === 1) {
-      toast.success("Last Card!", { duration: 2000 });
+      toast.success("🎴 Last Card!", {
+        duration: 2000,
+        style: {
+          background: "#DE2A02",
+          color: "#fff",
+        },
+      });
     }
 
     // Check for game over
@@ -123,19 +137,224 @@ export const useGameStore = create<GameStore>((set, get) => ({
         gameStatus: "finished",
         winner: winner.name,
       });
-      toast.success(`${winner.name} wins!`);
+      toast.success(`🏆 ${winner.name} wins!`, {
+        duration: 5000,
+        style: {
+          background: "#10B981",
+          color: "#fff",
+        },
+      });
       return;
     }
 
-    // Handle special card effects
-    const specialEffects = handleSpecialCard(card);
+    // Handle GENERAL MARKET (14) - FIXED: exclude current player
+    if (card.number === 14) {
+      const stateWithCard = {
+        ...state,
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        whotShapeDemand: undefined,
+        pendingPenalty: 0,
+        awaitingHoldOnCard: false,
+        awaitingSuspensionCard: false,
+      };
 
-    // Show notification for Whot card shape demand
-    if (card.suit === "whot") {
-      toast.success("Whot card played! Choose a shape.", { duration: 3000 });
+      const newState = applyGeneralMarket(stateWithCard, playerId);
+
+      toast("🛒 General Market! Everyone else draws 1 card.", {
+        duration: 3000,
+        icon: "🛒",
+        style: {
+          background: "#FBBF24",
+          color: "#000",
+        },
+      });
+
+      // Move to next player
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        ...newState,
+        currentPlayerIndex: nextPlayerIndex,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (newState.players[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+      return;
     }
 
-    // Move to next player
+    // Handle WHOT card (wild card)
+    if (card.suit === "whot") {
+      set({
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        pendingPenalty: 0,
+        awaitingHoldOnCard: false,
+        awaitingSuspensionCard: false,
+        // Don't change turn yet - player needs to choose shape
+      });
+
+      toast.success("🌟 Whot card played! Choose a shape.", {
+        duration: 3000,
+      });
+
+      // Player needs to call setWhotShapeDemand() before turn advances
+      return;
+    }
+
+    // Apply special card effects
+    const specialEffects = applySpecialCardEffect(card);
+
+    // HOLD ON (1) - Player MUST play another card immediately
+    if (card.number === 1) {
+      toast.success("⏸️ Hold On! Play another card of your choice.", {
+        duration: 3000,
+        icon: "⏸️",
+      });
+
+      set({
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        whotShapeDemand: undefined,
+        ...specialEffects,
+        canEndTurn: false,
+        // currentPlayerIndex stays the same - player plays again
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[state.currentPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 800);
+      }
+      return;
+    }
+
+    // SUSPENSION (8) - Player plays again with normal matching rules
+    if (card.number === 8) {
+      const nextPlayer = state.players[
+        getNextPlayerIndex(state.currentPlayerIndex, state.players.length, state.turnDirection)
+      ];
+
+      toast(`⏸️ ${nextPlayer.name} suspended! Play again.`, {
+        duration: 2000,
+        icon: "⏸️",
+      });
+
+      set({
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        whotShapeDemand: undefined,
+        ...specialEffects,
+        canEndTurn: false,
+        // currentPlayerIndex stays the same - player plays again
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[state.currentPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 800);
+      }
+      return;
+    }
+
+    // PICK 3 (5) - IS defendable, NOT stackable
+    if (card.number === 5) {
+      // If this is a defense (there was already a Pick 3 penalty)
+      if (state.pendingPenalty === 3) {
+        toast.success("🛡️ Pick 3 defended! Passing back...", {
+          duration: 2000,
+        });
+      } else {
+        toast(`⚠️ Pick 3 activated!`, {
+          duration: 3000,
+          icon: "⚠️",
+          style: {
+            background: "#EF4444",
+            color: "#fff",
+          },
+        });
+      }
+
+      // Move to next player (penalty stays at 3, doesn't stack)
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        currentPlayerIndex: nextPlayerIndex,
+        whotShapeDemand: undefined,
+        pendingPenalty: 3, // Stays at 3, doesn't stack
+        awaitingHoldOnCard: false,
+        awaitingSuspensionCard: false,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+      return;
+    }
+
+    // PICK 2 (2) - NOT defendable, NOT stackable
+    if (card.number === 2) {
+      toast(`⚠️ Pick 2! Next player must draw 2 cards.`, {
+        duration: 3000,
+        icon: "⚠️",
+        style: {
+          background: "#EF4444",
+          color: "#fff",
+        },
+      });
+
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        players: updatedPlayers,
+        discardPile: newDiscardPile,
+        lastPlayedCard: card,
+        currentPlayerIndex: nextPlayerIndex,
+        whotShapeDemand: undefined,
+        ...specialEffects,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+      return;
+    }
+
+    // NORMAL CARD - move to next player
     const nextPlayerIndex = getNextPlayerIndex(
       state.currentPlayerIndex,
       state.players.length,
@@ -147,15 +366,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       discardPile: newDiscardPile,
       lastPlayedCard: card,
       currentPlayerIndex: nextPlayerIndex,
-      whotShapeDemand: card.suit === "whot" ? undefined : state.whotShapeDemand,
+      whotShapeDemand: undefined,
       ...specialEffects,
+      canEndTurn: false,
     });
 
-    // If it's computer's turn, play automatically after a delay
+    // If it's computer's turn, play automatically
     if (updatedPlayers[nextPlayerIndex].isComputer) {
       setTimeout(() => {
         get().computerPlay();
-      }, 1000);
+      }, 1500);
     }
   },
 
@@ -168,35 +388,129 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    if (
-      state.currentPlayerIndex !==
-      state.players.findIndex((p) => p.id === playerId)
-    ) {
+    const playerIndex = state.players.findIndex((p) => p.id === playerId);
+    if (state.currentPlayerIndex !== playerIndex) {
       toast.error("Not your turn!");
       return;
     }
 
-    if (state.deck.length === 0) {
+    // Check if deck needs reshuffling
+    let currentDeck = state.deck;
+    let currentDiscardPile = state.discardPile;
+
+    if (currentDeck.length === 0) {
+      const { newDeck, newDiscardPile } = reshuffleDiscardPile(
+        currentDeck,
+        currentDiscardPile
+      );
+      currentDeck = newDeck;
+      currentDiscardPile = newDiscardPile;
+      
+      if (currentDeck.length > 0) {
+        toast("♻️ Deck reshuffled!", { duration: 2000 });
+      }
+    }
+
+    if (currentDeck.length === 0) {
       toast.error("No cards left in deck!");
       return;
     }
 
-    const [drawnCard, ...newDeck] = state.deck;
-    const updatedPlayers = state.players.map((p) =>
-      p.id === playerId ? { ...p, hand: [...p.hand, drawnCard] } : p
-    );
+    // Handle PICK 2 PENALTY (must draw 2, cannot defend)
+    if (state.pendingPenalty === 2) {
+      const { updatedPlayer, remainingDeck } = applyPickPenalty(
+        player,
+        currentDeck,
+        2
+      );
 
-    set({
-      players: updatedPlayers,
-      deck: newDeck,
-    });
+      const updatedPlayers = state.players.map((p) =>
+        p.id === playerId ? updatedPlayer : p
+      );
 
-    // Check for "Last Card" notification
-    if (updatedPlayers.find((p) => p.id === playerId)?.hand.length === 1) {
-      toast.success("Last Card!", { duration: 2000 });
+      toast.error(`Drew 2 cards! 😓`, {
+        duration: 3000,
+      });
+
+      // Move to next player after drawing penalty
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        players: updatedPlayers,
+        deck: remainingDeck,
+        discardPile: currentDiscardPile,
+        currentPlayerIndex: nextPlayerIndex,
+        pendingPenalty: 0,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+      return;
     }
 
-    // Move to next player
+    // Handle PICK 3 PENALTY (can defend or draw 3)
+    if (state.pendingPenalty === 3) {
+      const { updatedPlayer, remainingDeck } = applyPickPenalty(
+        player,
+        currentDeck,
+        3
+      );
+
+      const updatedPlayers = state.players.map((p) =>
+        p.id === playerId ? updatedPlayer : p
+      );
+
+      toast.error(`Drew 3 cards! 😓`, {
+        duration: 3000,
+      });
+
+      // Move to next player after drawing penalty
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        players: updatedPlayers,
+        deck: remainingDeck,
+        discardPile: currentDiscardPile,
+        currentPlayerIndex: nextPlayerIndex,
+        pendingPenalty: 0,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (updatedPlayers[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+      return;
+    }
+
+    // NORMAL DRAW: Draw 1 card
+    const { drawnCards, remainingDeck } = drawCards(currentDeck, 1);
+
+    if (drawnCards.length === 0) {
+      toast.error("Failed to draw card!");
+      return;
+    }
+
+    const updatedPlayers = state.players.map((p) =>
+      p.id === playerId ? { ...p, hand: [...p.hand, ...drawnCards] } : p
+    );
+
+    // Move to next player after drawing
     const nextPlayerIndex = getNextPlayerIndex(
       state.currentPlayerIndex,
       state.players.length,
@@ -204,15 +518,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
 
     set({
+      players: updatedPlayers,
+      deck: remainingDeck,
+      discardPile: currentDiscardPile,
       currentPlayerIndex: nextPlayerIndex,
-      pendingPenalty: 0, // Reset penalty after drawing
+      canEndTurn: false,
     });
 
-    // If it's computer's turn, play automatically after a delay
+    // If it's computer's turn, play automatically
     if (updatedPlayers[nextPlayerIndex].isComputer) {
       setTimeout(() => {
         get().computerPlay();
-      }, 1000);
+      }, 1500);
     }
   },
 
@@ -224,33 +541,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    const move = getComputerMove(
-      computer.hand,
-      state.lastPlayedCard,
-      state.whotShapeDemand
-    );
+    // Get computer's move
+    const move = getComputerMove(computer.hand, state);
 
     if (move.action === "play" && move.cardId) {
       const card = computer.hand.find((c) => c.id === move.cardId);
+      
+      // Play the card
       get().playCard(move.cardId, computer.id);
 
-      // Show notification for Whot card shape demand
-      if (card?.suit === "whot") {
+      // If Whot was played, automatically set the chosen shape
+      if (card?.suit === "whot" && move.chosenShape) {
         setTimeout(() => {
-          const shapes = ["circle", "triangle", "square", "star", "cross"];
-          const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-          get().setWhotShapeDemand(randomShape);
-          toast.success(`Computer demands: ${randomShape}`, { duration: 3000 });
-        }, 500);
+          get().setWhotShapeDemand(move.chosenShape!);
+          
+          // Format shape name nicely
+          const shapeName = move.chosenShape!.charAt(0).toUpperCase() + 
+                           move.chosenShape!.slice(1);
+          
+          toast.success(`Computer demands: ${shapeName}!`, {
+            duration: 3000,
+            icon: "🤖",
+          });
+
+          // Get updated state and move to next player
+          const updatedState = get();
+          const nextPlayerIndex = getNextPlayerIndex(
+            updatedState.currentPlayerIndex,
+            updatedState.players.length,
+            updatedState.turnDirection
+          );
+
+          set({
+            currentPlayerIndex: nextPlayerIndex,
+            canEndTurn: false,
+          });
+        }, 800);
       }
     } else {
+      // Computer draws a card
       get().drawCard(computer.id);
     }
   },
 
   endTurn: () => {
     const state = get();
+    
+    // Player must have played or drawn before ending turn
     if (!state.canEndTurn || state.gameStatus !== "playing") {
+      toast.error("You must play a card or draw before ending turn!");
       return;
     }
 
@@ -262,24 +601,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     set({
       currentPlayerIndex: nextPlayerIndex,
-      canEndTurn: true,
+      canEndTurn: false,
     });
 
-    // If it's computer's turn, play automatically after a delay
+    // If it's computer's turn, play automatically
     if (state.players[nextPlayerIndex].isComputer) {
       setTimeout(() => {
         get().computerPlay();
-      }, 1000);
+      }, 1500);
     }
   },
 
   setWhotShapeDemand: (shape: string) => {
-    set({ whotShapeDemand: shape });
+    const state = get();
+    
+    set({ 
+      whotShapeDemand: shape 
+    });
+
+    // After setting Whot shape, move to next player if it was player's turn
+    if (!state.players[state.currentPlayerIndex].isComputer) {
+      const nextPlayerIndex = getNextPlayerIndex(
+        state.currentPlayerIndex,
+        state.players.length,
+        state.turnDirection
+      );
+
+      set({
+        currentPlayerIndex: nextPlayerIndex,
+        canEndTurn: false,
+      });
+
+      // If it's computer's turn, play automatically
+      if (state.players[nextPlayerIndex].isComputer) {
+        setTimeout(() => {
+          get().computerPlay();
+        }, 1500);
+      }
+    }
   },
 
   resetGame: () => {
     set({
-      players: initialPlayers,
+      players: initialPlayers.map(p => ({ ...p, hand: [] })),
       currentPlayerIndex: 0,
       deck: [],
       discardPile: [],
@@ -290,9 +654,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       cardsToDraw: 0,
       pendingPenalty: 0,
       whotShapeDemand: undefined,
-      canEndTurn: true,
+      canEndTurn: false,
+      awaitingHoldOnCard: false,
+      awaitingSuspensionCard: false,
     });
 
-    toast.success("Game reset");
+    toast.success("Game reset. Start a new game!");
   },
 }));
