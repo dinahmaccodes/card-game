@@ -66,7 +66,7 @@ const Game: React.FC = () => {
 
   if (gameStatus === "waiting") {
     return (
-      <div className="h-screen w-screen bg-linear-to-br from-void-950 via-void-900 to-void-800 flex items-center justify-center">
+      <div className="h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +87,7 @@ const Game: React.FC = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="h-screen w-screen bg-linear-to-br from-void-950 via-void-900 to-void-800 flex items-center justify-center p-4"
+        className="h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex items-center justify-center p-4"
       >
         <motion.div
           initial={{ scale: 0.8, y: 50 }}
@@ -104,7 +104,7 @@ const Game: React.FC = () => {
             {winner === "You" ? "🏆" : "🤖"}
           </motion.div>
 
-          <h1 className="font-display text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-ember-400 to-ember-600 mb-3">
+          <h1 className="font-display text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-ember-400 to-ember-600 mb-3">
             Game Over!
           </h1>
 
@@ -117,7 +117,7 @@ const Game: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={resetGame}
-              className="w-full bg-linear-to-r from-ember-500 to-ember-600 hover:from-ember-600 hover:to-ember-700 text-white font-bold py-4 px-6 rounded-xl transition-all glow-ember"
+              className="w-full bg-gradient-to-r from-ember-500 to-ember-600 hover:from-ember-600 hover:to-ember-700 text-white font-bold py-4 px-6 rounded-xl transition-all glow-ember"
             >
               Play Again
             </motion.button>
@@ -137,9 +137,9 @@ const Game: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen bg-linear-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
       <Toaster
-        position="top-center"
+        position="top-right"
         toastOptions={{
           style: {
             background: "#1c1c26",
@@ -157,10 +157,10 @@ const Game: React.FC = () => {
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-linear-to-br from-ember-500 to-ember-700 rounded-xl flex items-center justify-center shadow-lg glow-ember">
+          <div className="w-10 h-10 bg-gradient-to-br from-ember-500 to-ember-700 rounded-xl flex items-center justify-center shadow-lg glow-ember">
             <span className="text-white text-xl font-bold">L</span>
           </div>
-          <h1 className="font-display text-2xl font-bold text-transparent bg-clip-text bg-linear-to-r from-ember-400 to-ember-600">
+          <h1 className="font-display text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-ember-400 to-ember-600">
             Linot
           </h1>
         </div>
@@ -198,7 +198,7 @@ const Game: React.FC = () => {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-linear-to-br from-void-700 to-void-900 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-void-700 to-void-900 rounded-full flex items-center justify-center">
                 <span className="text-xl">🤖</span>
               </div>
               <span className="text-white font-semibold text-sm sm:text-base">
@@ -252,11 +252,11 @@ const Game: React.FC = () => {
             >
                 
               {/* Stacked Effect  */}
-               <div className="absolute top-1 left-1 w-full h-full bg-linear-to-br from-ember-600/30 to-ember-800/30 rounded-xl blur-sm" />  
-               <div className="absolute top-0.5 left-0.5 w-full h-full bg-linear-to-br from-ember-600/50 to-ember-800/50 rounded-xl" />
+               <div className="absolute top-1 left-1 w-full h-full bg-gradient-to-br from-ember-600/30 to-ember-800/30 rounded-xl blur-sm" />  
+               <div className="absolute top-0.5 left-0.5 w-full h-full bg-gradient-to-br from-ember-600/50 to-ember-800/50 rounded-xl" />
 
               {/* Main Deck */}
-              <div className="relative w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-40 bg-linear-to-br from-ember-600 via-ember-700 to-ember-900 rounded-xl shadow-2xl flex flex-col items-center justify-center border-2 border-ember-500/50">
+              <div className="relative w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-40 bg-gradient-to-br from-ember-600 via-ember-700 to-ember-900 rounded-xl shadow-2xl flex flex-col items-center justify-center border-2 border-ember-500/50">
                 <div className="text-white text-4xl sm:text-5xl mb-2">🃏</div>
                 <div className="text-ember-200 font-bold text-lg">
                   {deck.length}
@@ -336,7 +336,7 @@ const Game: React.FC = () => {
         >
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-linear-to-br from-ember-500 to-ember-700 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-ember-500 to-ember-700 rounded-full flex items-center justify-center">
                 <span className="text-xl">👤</span>
               </div>
               <span className="text-white font-semibold text-sm sm:text-base">
@@ -408,7 +408,7 @@ const Game: React.FC = () => {
               className="glass rounded-2xl p-6 max-w-md w-full border-2 border-ember-500/30"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="font-display text-2xl font-bold text-transparent bg-clip-text bg-linear-to-r from-ember-400 to-ember-600 mb-6 text-center">
+              <h3 className="font-display text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-ember-400 to-ember-600 mb-6 text-center">
                 Choose a Shape
               </h3>
 
@@ -447,7 +447,7 @@ const Game: React.FC = () => {
                     onClick={() => handleShapeSelection(shape.name)}
                     className={`
                       glass hover:bg-white/10
-                      bg-linear-to-br ${shape.color}
+                      bg-gradient-to-br ${shape.color}
                       bg-clip-padding
                       text-white font-bold py-6 rounded-xl
                       transition-all flex flex-col items-center gap-2

@@ -83,14 +83,24 @@ export const canPlayCard = (
   // Provide defaults for gameState properties
   const pendingPenalty = gameState?.pendingPenalty ?? 0;
   const whotShapeDemand = gameState?.whotShapeDemand;
+  const awaitingHoldOnCard = gameState?.awaitingHoldOnCard ?? false;
 
-  // CRITICAL FIX: If there's a pending penalty (Pick 2/3), ONLY Pick 2 can be played
-  // Whot cards CANNOT be used to defend against Pick penalties!
-  if (pendingPenalty > 0) {
-    return card.number === 2; // Only Pick 2 is allowed, NOT Whot!
+  // HOLD ON LOGIC: If awaiting second card after Hold On, ANY card can be played
+  if (awaitingHoldOnCard) {
+    return true;
   }
 
-  // Whot cards can be played ONLY if there's no Pick penalty
+  // PICK 2 PENALTY: Cannot defend Pick 2 with anything (not even Whot)
+  if (pendingPenalty === 2) {
+    return false; // Must draw, cannot play any card
+  }
+
+  // PICK 3 PENALTY: Can only defend with another Pick 3 (NOT Whot)
+  if (pendingPenalty === 3) {
+    return card.number === 5; // Only Pick 3 can defend
+  }
+
+  // Whot cards can be played ONLY if there's no penalty
   if (card.suit === "whot") return true;
 
   // If there's a Whot shape demand, ONLY that shape (or another Whot) can be played
@@ -104,7 +114,7 @@ export const canPlayCard = (
   );
 };
 
-// Get playable cards from a hand - FIXED
+// Get playable cards from a hand
 export const getPlayableCards = (
   hand: Card[],
   lastPlayedCard: Card | undefined,
@@ -113,7 +123,7 @@ export const getPlayableCards = (
   return hand.filter((card) => canPlayCard(card, lastPlayedCard, gameState));
 };
 
-// Draw multiple cards from deck - FIXED
+// Draw multiple cards from deck
 export const drawCards = (
   deck: Card[],
   count: number
@@ -134,60 +144,71 @@ export const drawCards = (
   return { drawnCards, remainingDeck };
 };
 
-// Handle special card effects - FIXED
+// Handle special card effects - UPDATED
 export const applySpecialCardEffect = (
   card: Card,
-  gameState: GameState
 ): Partial<GameState> => {
   const updates: Partial<GameState> = {};
 
   switch (card.number) {
-    case 1: // Hold On - skip next player
+    case 1: // Hold On - player MUST play another card
       updates.pendingPenalty = 0;
-      // Skip will be handled in turn advancement
+      updates.awaitingHoldOnCard = true; // Flag to allow ANY card next
+      // Don't advance turn yet
       break;
 
-    case 2: {
-      // Pick Two - accumulate penalty
-      const currentPenalty = gameState.pendingPenalty || 0;
-      updates.pendingPenalty = currentPenalty + 2;
+    case 2: // Pick Two - NOT defendable, NOT stackable
+      updates.pendingPenalty = 2;
+      updates.awaitingHoldOnCard = false;
       break;
-    }
 
-    case 5: // Pick Three - set penalty
+    case 5: // Pick Three - IS defendable, NOT stackable
       updates.pendingPenalty = 3;
+      updates.awaitingHoldOnCard = false;
       break;
 
-    case 8: // Suspension - skip next player
+    case 8: // Suspension - player plays again with normal rules
       updates.pendingPenalty = 0;
-      // Skip will be handled in turn advancement
+      updates.awaitingSuspensionCard = true; // Flag for suspension chain
+      updates.awaitingHoldOnCard = false;
+      // Don't advance turn yet
       break;
 
-    case 14: // General Market - everyone draws 1
-      // This needs to be handled separately as it affects all players
+    case 14: // General Market - everyone except current player draws 1
       updates.pendingPenalty = -1; // Special marker for General Market
+      updates.awaitingHoldOnCard = false;
       break;
 
     case 20: // Whot - wild card
       updates.pendingPenalty = 0;
+      updates.awaitingHoldOnCard = false;
       // whotShapeDemand will be set when player chooses shape
       break;
 
     default:
       updates.pendingPenalty = 0;
       updates.whotShapeDemand = undefined;
+      updates.awaitingHoldOnCard = false;
+      updates.awaitingSuspensionCard = false;
       break;
   }
 
   return updates;
 };
 
-// Apply General Market effect - FIXED
-export const applyGeneralMarket = (gameState: GameState): GameState => {
+// Apply General Market effect - FIXED to exclude current player
+export const applyGeneralMarket = (
+  gameState: GameState,
+  currentPlayerId: string
+): GameState => {
   const newState = { ...gameState };
 
-  // Each player (including current player) draws 1 card
+  // Each player EXCEPT the one who played the card draws 1 card
   newState.players = newState.players.map((player) => {
+    if (player.id === currentPlayerId) {
+      return player; // Current player doesn't draw
+    }
+
     const { drawnCards, remainingDeck } = drawCards(newState.deck, 1);
     newState.deck = remainingDeck;
 
@@ -201,7 +222,7 @@ export const applyGeneralMarket = (gameState: GameState): GameState => {
   return newState;
 };
 
-// Apply Pick penalty - FIXED
+// Apply Pick penalty
 export const applyPickPenalty = (
   player: Player,
   deck: Card[],
@@ -245,7 +266,7 @@ export const skipNextPlayer = (
   return getNextPlayerIndex(nextIndex, totalPlayers, direction);
 };
 
-// Computer AI - FIXED and SMARTER
+// Computer AI - UPDATED
 export const getComputerMove = (
   hand: Card[],
   gameState: GameState
@@ -254,12 +275,13 @@ export const getComputerMove = (
   cardId?: string;
   chosenShape?: Card["suit"];
 } => {
-  const { lastPlayedCard, pendingPenalty = 0, whotShapeDemand } = gameState;
+  const { lastPlayedCard, pendingPenalty = 0, whotShapeDemand, awaitingHoldOnCard } = gameState;
 
   // Get all playable cards
   const playableCards = getPlayableCards(hand, lastPlayedCard, {
     pendingPenalty,
     whotShapeDemand,
+    awaitingHoldOnCard,
   });
 
   // If no playable cards, must draw
@@ -267,28 +289,39 @@ export const getComputerMove = (
     return { action: "draw" };
   }
 
-  // Strategy: Prioritize playing special cards
-
-  // 1. If Pick 2/3 is active, try to defend with Pick 2
-  if (pendingPenalty > 0) {
-    const defensePick2 = playableCards.find((c) => c.number === 2);
-    if (defensePick2) {
-      return { action: "play", cardId: defensePick2.id };
+  // HOLD ON LOGIC: If awaiting second card, play any card (prioritize getting rid of specials)
+  if (awaitingHoldOnCard) {
+    const specialCards = playableCards.filter((c) => c.isSpecial && c.suit !== "whot");
+    if (specialCards.length > 0) {
+      return { action: "play", cardId: specialCards[0].id };
     }
-    // If can't defend, must draw (but this shouldn't happen as we filtered)
+    return { action: "play", cardId: playableCards[0].id };
+  }
+
+  // PICK 2 PENALTY: Cannot defend, must draw
+  if (pendingPenalty === 2) {
     return { action: "draw" };
   }
 
-  // 2. Prioritize getting rid of high-value/special cards
-  const specialCards = playableCards.filter((c) => c.isSpecial);
+  // PICK 3 PENALTY: Try to defend with Pick 3
+  if (pendingPenalty === 3) {
+    const defensePick3 = playableCards.find((c) => c.number === 5);
+    if (defensePick3) {
+      return { action: "play", cardId: defensePick3.id };
+    }
+    // If can't defend, must draw
+    return { action: "draw" };
+  }
+
+  // Strategy: Prioritize playing special cards
+  const specialCards = playableCards.filter((c) => c.isSpecial && c.suit !== "whot");
   const highValueCards = playableCards.filter((c) => c.number >= 10);
 
   let cardToPlay: Card | undefined;
 
   // Play special cards first (except save Whot for emergencies)
-  const nonWhotSpecials = specialCards.filter((c) => c.suit !== "whot");
-  if (nonWhotSpecials.length > 0) {
-    cardToPlay = nonWhotSpecials[0];
+  if (specialCards.length > 0) {
+    cardToPlay = specialCards[0];
   }
   // Then play high value cards
   else if (highValueCards.length > 0) {
@@ -343,27 +376,38 @@ const getMostCommonShape = (hand: Card[]): Card["suit"] => {
   return mostCommonShape;
 };
 
-// Validate card play attempt - FIXED
+// Validate card play attempt - UPDATED
 export const validateCardPlay = (
   card: Card,
   gameState: Partial<GameState>
 ): { valid: boolean; reason?: string } => {
-  const { lastPlayedCard, pendingPenalty = 0, whotShapeDemand } = gameState;
+  const { lastPlayedCard, pendingPenalty = 0, whotShapeDemand, awaitingHoldOnCard } = gameState;
 
-  // CRITICAL FIX: If Pick penalty is active, ONLY Pick 2 can be played
-  // Whot cards are NOT allowed as defense!
-  if (pendingPenalty > 0) {
-    if (card.number !== 2) {
-      return {
-        valid: false,
-        reason: `Pick ${pendingPenalty} is active! Only Pick 2 can defend. Play Pick 2 or draw ${pendingPenalty} cards.`,
-      };
-    }
-    // If it IS Pick 2, it's valid
+  // HOLD ON LOGIC: If awaiting second card, ANY card is valid
+  if (awaitingHoldOnCard) {
     return { valid: true };
   }
 
-  // Whot cards can be played (but only when no Pick penalty is active)
+  // PICK 2 PENALTY: Cannot defend with ANY card (not even Whot)
+  if (pendingPenalty === 2) {
+    return {
+      valid: false,
+      reason: `Pick 2 is active! You cannot defend. You must draw 2 cards.`,
+    };
+  }
+
+  // PICK 3 PENALTY: Can only defend with another Pick 3 (NOT Whot)
+  if (pendingPenalty === 3) {
+    if (card.number !== 5) {
+      return {
+        valid: false,
+        reason: `Pick 3 is active! Play another Pick 3 to defend, or draw 3 cards.`,
+      };
+    }
+    return { valid: true };
+  }
+
+  // Whot cards can be played (but only when no penalty is active)
   if (card.suit === "whot") return { valid: true };
 
   // If Whot shape is demanded, must match that shape (or play another Whot)
@@ -402,10 +446,16 @@ export const needsToDrawPenalty = (
 ): boolean => {
   if (pendingPenalty === 0) return false;
 
-  // Check if player has Pick 2 to defend
-  const hasPick2 = hand.some((card) => card.number === 2);
+  // Pick 2 cannot be defended
+  if (pendingPenalty === 2) return true;
 
-  return !hasPick2;
+  // Pick 3 can be defended with another Pick 3
+  if (pendingPenalty === 3) {
+    const hasPick3 = hand.some((card) => card.number === 5);
+    return !hasPick3;
+  }
+
+  return false;
 };
 
 // Reshuffle discard pile into deck when deck is empty

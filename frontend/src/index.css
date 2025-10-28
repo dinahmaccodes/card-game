@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 @theme {
   /* Font Families */
   --font-family-display: "Baloo 2", cursive;
@@ -34,13 +35,6 @@
   /* Glass Effect Colors */
   --color-glass-light: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
-}
-
-/* Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 :root {

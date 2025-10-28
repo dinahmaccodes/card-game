@@ -25,6 +25,8 @@ export interface GameState {
   pendingPenalty: number; // Cards to draw due to Pick 2/3
   whotShapeDemand?: string; // Shape demanded by Whot card
   canEndTurn: boolean; // Whether player can end turn manually
+  awaitingHoldOnCard?: boolean; // Player must play second card after Hold On
+  awaitingSuspensionCard?: boolean; // Player can continue playing after Suspension
 }
 
 export interface GameAction {
