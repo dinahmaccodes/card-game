@@ -75,40 +75,73 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ## Development Plan
 
-### **Wave 1: Core Game Prototype (Oct 20–29)**
+### **Wave 1: Core Game** (Oct 20–29)
+**Scope:** Prove it works  
+- Frontend template ready (React + Tailwind)
+- Backend structure drafted with comments
+- README and documentation complete  
 
-**Goal:** Prove that Linera can handle real-time multiplayer flow.
+**Deliverable:** Basic setup + architecture foundation.
 
-- Frontend template (React + Tailwind)
-- Core gameplay logic (Whot rules + turns)
-- Local state management scaffold
-- Documentation (README + architecture notes)
+---
 
-### **Wave 2: On-Chain Integration (Nov 1–15)**
+### **Wave 2: Multi-player Action Begins (Nov 3–12)**
 
-**Goal:** Move from simulation to live microchains.
+**Goal:** Move from simulation to live microchains and begin foundation for multiplayer action
 
+#### Gameplay
+
+- Implement full **Whot rules** (card matching, special cards, turn order).
+- Add **1v1 vs computer opponent** for baseline logic (optional)  
+- Transition to **human vs human (2–4 players)** gameplay. (main feature)
 - On-chain match creation and card actions
-- Persistent match state
-- Initial betting module
 
-### **Wave 3: Prediction Market + Spectator Experience (Nov 16–30)**
+-----
 
-**Goal:** Add live betting and audience dashboard.
+### **Wave 3: Betting Mechanics + Multiplayer Action Continues (Nov 17–26)**
 
-- Dynamic odds update system
+**Goal:** Complete Multiplayer feature and Betting Mechanism starts
+
 - Spectator leaderboard
-- Manual reward tracking
+- Maintain Persistent match state
+- Each match operates on **its own microchain** for instant updates.
 
-### **Wave 4: MVP Launch (Dec)**
+#### Betting Mechanics  
+- Draft Logic for Initial betting module
+- Add manual **staking system** for multiplayer matches (winner takes all).  
+- Build **betting logic** for internal players.  
+- Track results and payouts manually for now
+
+
+### **Wave 4: Improve Features (Dec 1-10)**
 
 **Goal:** Fully playable demo for Linera Showcase.
 
 - End-to-end on-chain gameplay
 - Wallet connection
-- Polished UI + Demo video
+
+#### Plans to Improve Player Experience  
+- Integrate **leaderboards** and player stats.  
+- Improve animations, responsive layout, and lobby UX.  
+- Initial implementation of **tournament mode** (4–8 players). 
 
 ---
+### **Wave 5: Perfect Betting Feature and Larger Multiplayer Feature (Dec 15 - Jan 7)** 
+- Real-time leaderboard updates  
+- Improved performance for large tournaments 
+- Perfect implementation of **tournament mode** (4–8 players). 
+----
+
+### **Wave 6: MVP Launch (Jan 12-21)**
+**Goal:** Prepare for presentation and Linera testnet launch.  
+
+- Full UI overhaul for presentation  
+- Onboarding tutorial + in-game guide  
+- Load testing and bug cleanup  
+- Documentation finalization  
+- Recorded demo and marketing materials  
+
+**Demo:** Polished, production-ready dApp for Linera Showcase and ETH Denver if possible.
 
 ## Team
 
@@ -130,8 +163,8 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ## Future Ideas
 
-- ⚔️ **Tournaments + Seasonal Leagues** for competitive play
-- 🧾 **Reward Dashboard** for manually tracking winners
+- ⚔️ **Tournaments + Seasonal Leagues** for competitive play as community and user numbers grow
+- 🧾 **Reward Dashboard** for automatically tracking winners globally
 - 🌉 **Cross-Microchain Communication** experiments for match coordination
 - 📈 **Match Analytics** to visualize performance across sessions
 
