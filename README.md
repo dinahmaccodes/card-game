@@ -12,7 +12,7 @@
 ## Overview
 
 **Linot** is a multiplayer Whot-style card game built on Linera’s microchain architecture.  
-It reimagines the classic African card game we grew up playing as kids — but this time, every move happens **on-chain**, instantly.
+It reimagines the classic local card game we grew up playing as kids — but this time, every move happens instantly.
 
 Players can challenge friends, join tournaments, or spectate live matches.  
 Spectators can even **bet on matches in real time**, with odds that update dynamically as the game progresses.
