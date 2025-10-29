@@ -8,7 +8,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartGame }) => {
   const [showRules, setShowRules] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
+  <div className="dashboard-root min-h-screen w-full bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="text-center sm:pt-12 pb-6 px-4">
         <div className="flex items-center justify-center mb-4">

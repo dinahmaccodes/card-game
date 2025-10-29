@@ -137,7 +137,7 @@ const Game: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
+    <div className="game-root min-h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-auto md:overflow-hidden">
       <Toaster
         position="top-right"
         toastOptions={{
