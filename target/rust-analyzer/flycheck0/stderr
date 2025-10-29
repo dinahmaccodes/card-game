@@ -1,0 +1,4 @@
+   0.358758973s  INFO prepare_target{force=false package_id=backend v0.1.0 (/home/dinahmaccodes/Documents/codes-rust-linera/card-game/backend) target="single_chain"}: cargo::core::compiler::fingerprint: fingerprint dirty for backend v0.1.0 (/home/dinahmaccodes/Documents/codes-rust-linera/card-game/backend)/Check { test: true }/TargetInner { kind: "test", name: "single_chain", benched: false, ..: with_path("/home/dinahmaccodes/Documents/codes-rust-linera/card-game/backend/tests/single_chain.rs", Edition2021) }
+   0.358794417s  INFO prepare_target{force=false package_id=backend v0.1.0 (/home/dinahmaccodes/Documents/codes-rust-linera/card-game/backend) target="single_chain"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(Stale)
+    Checking backend v0.1.0 (/home/dinahmaccodes/Documents/codes-rust-linera/card-game/backend)
+error: could not compile `backend` (test "single_chain") due to 2 previous errors
