@@ -54,7 +54,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  /* Allow vertical scrolling (needed on small/mobile screens) while
+     preventing horizontal overflow. Previously `overflow: hidden` blocked
+     scrolling entirely on mobile. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Landscape Mode Enforcement for Mobile */
@@ -76,8 +81,11 @@ body {
     font-size: 1.5rem;
     text-align: center;
     padding: 2rem;
-    z-index: 99999;
-    gap: 1rem;
+   z-index: 99999;
+   gap: 1rem;
+   /* Make the overlay non-interactive so touches/scrolls pass through
+     to the page underneath (allows scrolling while the rotate message is shown). */
+   pointer-events: none;
   }
 
   body::after {
@@ -91,6 +99,28 @@ body {
     color: rgba(255, 255, 255, 0.6);
     z-index: 99999;
     padding: 0 2rem;
+    /* Also non-interactive so touch gestures are handled by the page. */
+    pointer-events: none;
+  }
+}
+
+/* When on small devices in landscape, allow the main game container to scroll
+   vertically so players can pan to see their cards and opponents' areas. */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .game-root,
+  .dashboard-root {
+    /* allow vertical scrolling */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    /* let the container grow taller than the viewport so it can be scrolled */
+    height: auto !important;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure the content inside can expand and not be clipped by fixed heights */
+  .game-root .flex-1 {
+    min-height: 0;
   }
 }
 
