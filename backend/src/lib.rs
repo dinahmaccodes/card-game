@@ -1,7 +1,8 @@
 use async_graphql::{Request, Response};
 use linera_sdk::{
+    abi::{ContractAbi, ServiceAbi},
     graphql::GraphQLMutationRoot,
-    linera_base_types::{AccountOwner, ContractAbi, ServiceAbi},
+    linera_base_types::AccountOwner,
 };
 use serde::{Deserialize, Serialize};
 
@@ -38,8 +39,20 @@ pub enum CardSuit {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, async_graphql::Enum, PartialEq, Eq)]
 pub enum CardValue {
-    One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten,
-    Eleven, Twelve, Thirteen, Fourteen,
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Eleven,
+    Twelve,
+    Thirteen,
+    Fourteen,
     Whot,
     PickTwo,
     PickThree,
@@ -66,31 +79,30 @@ pub enum Operation {
     JoinMatch {
         nickname: String,
     },
-    
+
     /// Start the match (host only)
     StartMatch,
 
-    
     /// Play a card from your hand
     PlayCard {
         card_index: usize,
         chosen_suit: Option<CardSuit>, // Required for Whot card
     },
-    
+
     /// Draw a card from the deck (when stuck or choosing to draw)
     DrawCard,
-    
+
     /// Call "Last Card!" when you have exactly 1 card
     CallLastCard,
-    
+
     /// Challenge someone who forgot to call Last Card
     ChallengeLastCard {
         player_index: usize,
     },
-    
+
     /// Leave the match (forfeit)
     LeaveMatch,
-    
+
     // Wave 4-5: Betting (placeholder)
     PlaceBet {
         player_index: usize,
@@ -107,13 +119,13 @@ pub enum Message {
         inviter: AccountOwner,
         match_id: String,
     },
-    
+
     /// Player accepted invitation from another chain
     PlayerJoined {
         player: AccountOwner,
         nickname: String,
     },
-    
+
     /// Broadcast match state update to spectators
     StateUpdate {
         current_player: AccountOwner,

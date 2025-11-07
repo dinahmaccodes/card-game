@@ -378,6 +378,7 @@ dependencies = [
  "async-graphql",
  "futures",
  "linera-sdk",
+ "linera-views",
  "serde",
  "serde_json",
  "tokio",

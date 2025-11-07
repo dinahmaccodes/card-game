@@ -1,29 +1,412 @@
-//! Linot contract (sketch)
-//!
-//! For now this file is a commented design sketch so the repo builds cleanly.
-//! The real contract (V1) will:
-//!
-//!  - Define a `LinotContract` that persists `LinotState` into on-chain views
-//!  - Handle `Operation` enums (JoinMatch, StartMatch, PlayCard, DrawCard,
-//!    CallLastCard, ChallengeLastCard, LeaveMatch, PlaceBet)
-//!  - Use deterministic deck creation and `chain_id`-derived seed for shuffle
-//!  - Validate moves using `GameEngine` helpers and apply special card effects
-//!  - Save state at the end of `store()`
-//!  - Send/receive cross-chain `Message` types for invites / spectator updates
-//!
-//! Implementation notes / planned flow:
-//! 1. `instantiate(config)` stores match configuration and creates a shuffled
-//!    deck seeded from the `chain_id`.
-//! 2. `execute_operation(op)` authenticates caller and dispatches to helpers
-//!    that mutate an in-memory `MatchData` snapshot, then write it to storage.
-//! 3. Special cards (PickTwo, Whot, etc.) are implemented in `GameEngine` and
-//!    applied after a successful `PlayCard`.
-//! 4. Betting (Wave 4/5) is an optional `RegisterView<Option<BettingPool>>`.
-//!
-//! For the immediate goal (reduce compile noise) this file intentionally
-//! contains no operational code. We'll restore the contract implementation
-//! from the working design draft in future iterations.
+#![cfg_attr(target_arch = "wasm32", no_main)]
 
-fn main() {
-    // Binary stub: real contract uses Linera macros and compiles to WASM.
+mod game_engine;
+mod state;
+
+use linera_sdk::{
+    abi::WithContractAbi, linera_base_types::AccountOwner, views::View, Contract, ContractRuntime,
+};
+
+use crate::game_engine::{GameEngine, GameResult, SpecialEffect};
+use crate::state::{LinotState, MatchConfig, MatchData, MatchStatus, Player};
+use linot::{CardSuit, LinotAbi, Message, Operation};
+
+pub struct LinotContract {
+    state: LinotState,
+    runtime: ContractRuntime<Self>,
+}
+
+linera_sdk::contract!(LinotContract);
+
+impl WithContractAbi for LinotContract {
+    type Abi = LinotAbi;
+}
+
+impl Contract for LinotContract {
+    type Message = Message;
+    type Parameters = ();
+    type InstantiationArgument = MatchConfig;
+    type EventValue = ();
+
+    async fn load(runtime: ContractRuntime<Self>) -> Self {
+        let state = LinotState::load(runtime.root_view_storage_context())
+            .await
+            .expect("Failed to load state");
+        LinotContract { state, runtime }
+    }
+
+    async fn instantiate(&mut self, config: Self::InstantiationArgument) {
+        // Store match configuration
+        self.state.config.set(config);
+
+        // Initialize empty match data
+        let mut match_data = MatchData::default();
+        match_data.created_at = self.runtime.system_time().micros();
+        match_data.status = MatchStatus::Waiting;
+
+        self.state.match_data.set(match_data);
+
+        // Initialize betting pool as None
+        self.state.betting_pool.set(None);
+    }
+
+    async fn execute_operation(&mut self, operation: Self::Operation) -> Self::Response {
+        let caller = self
+            .runtime
+            .authenticated_signer()
+            .expect("Caller required");
+
+        match operation {
+            Operation::JoinMatch { nickname } => {
+                self.handle_join_match(caller, nickname).await;
+            }
+            Operation::StartMatch => {
+                self.handle_start_match(caller).await;
+            }
+            Operation::PlayCard {
+                card_index,
+                chosen_suit,
+            } => {
+                self.handle_play_card(caller, card_index, chosen_suit).await;
+            }
+            Operation::DrawCard => {
+                self.handle_draw_card(caller).await;
+            }
+            Operation::CallLastCard => {
+                self.handle_call_last_card(caller).await;
+            }
+            Operation::ChallengeLastCard { player_index } => {
+                self.handle_challenge_last_card(caller, player_index).await;
+            }
+            Operation::LeaveMatch => {
+                self.handle_leave_match(caller).await;
+            }
+            Operation::PlaceBet {
+                player_index: _,
+                amount: _,
+            } => {
+                // Placeholder for Wave 4-5 betting
+                panic!("Betting not implemented in V1");
+            }
+        }
+    }
+
+    async fn execute_message(&mut self, message: Self::Message) {
+        match message {
+            Message::InvitePlayer {
+                inviter: _,
+                match_id: _,
+            } => {
+                // Cross-chain invitation (Wave 3)
+                // For V1, we don't implement cross-chain invites
+            }
+            Message::PlayerJoined { player, nickname } => {
+                self.handle_remote_join(player, nickname).await;
+            }
+            Message::StateUpdate {
+                current_player: _,
+                top_card: _,
+            } => {
+                // Broadcast state update (for spectators)
+            }
+        }
+    }
+
+    async fn store(mut self) {
+        self.state.save().await.expect("Failed to save state");
+    }
+}
+
+impl LinotContract {
+    /// Handle player joining the match
+    async fn handle_join_match(&mut self, caller: AccountOwner, nickname: String) {
+        let mut match_data = self.state.match_data.get().clone();
+        let config = self.state.config.get().clone();
+
+        // Validate: match must be waiting
+        assert_eq!(
+            match_data.status,
+            MatchStatus::Waiting,
+            "Match already started"
+        );
+
+        // Validate: not at max players
+        assert!(
+            match_data.players.len() < config.max_players as usize,
+            "Match is full"
+        );
+
+        // Validate: player not already joined
+        assert!(
+            !match_data.players.iter().any(|p| p.owner == caller),
+            "Already joined"
+        );
+
+        // Add player
+        match_data.players.push(Player::new(caller, nickname));
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle starting the match
+    async fn handle_start_match(&mut self, caller: AccountOwner) {
+        let config = self.state.config.get().clone();
+        let mut match_data = self.state.match_data.get().clone();
+
+        // Validate: only host can start
+        assert_eq!(caller, config.host, "Only host can start match");
+
+        // Validate: enough players (2 for V1)
+        assert_eq!(match_data.players.len(), 2, "Need exactly 2 players");
+
+        // Validate: match is waiting
+        assert_eq!(
+            match_data.status,
+            MatchStatus::Waiting,
+            "Match already started"
+        );
+
+        // Create and shuffle deck
+        let mut deck = GameEngine::create_deck();
+        let chain_id = self.runtime.chain_id();
+        let seed = chain_id.to_string();
+        GameEngine::shuffle_with_seed(&mut deck, seed.as_bytes());
+
+        // Deal initial hands (6 cards each)
+        let hands = GameEngine::deal_initial_hands(&mut deck, match_data.players.len());
+        for (i, player) in match_data.players.iter_mut().enumerate() {
+            player.cards = hands[i].clone();
+            player.update_card_count();
+        }
+
+        // Place first card in discard pile
+        if let Some(first_card) = deck.pop() {
+            match_data.discard_pile.push(first_card);
+        }
+
+        // Update match state
+        match_data.deck = deck;
+        match_data.status = MatchStatus::InProgress;
+        match_data.current_player_index = 0;
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle playing a card
+    async fn handle_play_card(
+        &mut self,
+        caller: AccountOwner,
+        card_index: usize,
+        chosen_suit: Option<CardSuit>,
+    ) {
+        let mut match_data = self.state.match_data.get().clone();
+
+        // Validate: match is in progress
+        assert_eq!(
+            match_data.status,
+            MatchStatus::InProgress,
+            "Match not in progress"
+        );
+
+        // Validate: it's caller's turn
+        let current_player = &mut match_data.players[match_data.current_player_index];
+        assert_eq!(current_player.owner, caller, "Not your turn");
+
+        // Validate: card index is valid
+        assert!(
+            card_index < current_player.cards.len(),
+            "Invalid card index"
+        );
+
+        // Get the card
+        let card = current_player.cards[card_index].clone();
+
+        // Get top card from discard pile
+        let top_card = match_data
+            .discard_pile
+            .last()
+            .expect("No card in discard pile");
+
+        // Validate: card can be played
+        assert!(
+            GameEngine::is_valid_play(
+                &card,
+                top_card,
+                match_data.active_shape_demand,
+                match_data.pending_penalty,
+            ),
+            "Invalid play"
+        );
+
+        // Remove card from hand
+        current_player.cards.remove(card_index);
+        current_player.update_card_count();
+
+        // Add to discard pile
+        match_data.discard_pile.push(card.clone());
+
+        // Check if player should call last card
+        if current_player.card_count == 1 && !current_player.called_last_card {
+            // Automatic last card call in V1
+            current_player.called_last_card = true;
+        }
+
+        // Apply special card effect
+        let effect = GameEngine::get_card_effect(&card);
+        GameEngine::apply_effect(&mut match_data, effect, chosen_suit);
+
+        // Check if game ended
+        if let Some(result) = GameEngine::check_game_end(&match_data) {
+            match result {
+                GameResult::Winner(idx) => {
+                    match_data.winner_index = Some(idx);
+                    match_data.status = MatchStatus::Finished;
+                }
+                GameResult::Draw => {
+                    match_data.status = MatchStatus::Finished;
+                }
+            }
+        }
+
+        // Handle General Market effect if needed
+        if let SpecialEffect::AllDrawOne = effect {
+            Self::apply_general_market(&mut match_data);
+        }
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle drawing a card
+    async fn handle_draw_card(&mut self, caller: AccountOwner) {
+        let mut match_data = self.state.match_data.get().clone();
+
+        // Validate: it's caller's turn
+        let current_player_idx = match_data.current_player_index;
+        let current_player = &mut match_data.players[current_player_idx];
+        assert_eq!(current_player.owner, caller, "Not your turn");
+
+        // Determine how many cards to draw
+        let cards_to_draw = if match_data.pending_penalty > 0 {
+            let count = match_data.pending_penalty;
+            match_data.pending_penalty = 0;
+            count
+        } else {
+            1
+        };
+
+        // Draw cards
+        for _ in 0..cards_to_draw {
+            if match_data.deck.is_empty() {
+                // Reshuffle discard pile (except top card)
+                if match_data.discard_pile.len() > 1 {
+                    let top_card = match_data.discard_pile.pop().unwrap();
+                    match_data.deck = match_data.discard_pile.clone();
+                    match_data.discard_pile.clear();
+                    match_data.discard_pile.push(top_card);
+
+                    // Reshuffle with new seed
+                    match_data.round_number += 1;
+                    let seed = format!("{}{}", self.runtime.chain_id(), match_data.round_number);
+                    GameEngine::shuffle_with_seed(&mut match_data.deck, seed.as_bytes());
+                } else {
+                    break; // No more cards available
+                }
+            }
+
+            if let Some(card) = match_data.deck.pop() {
+                current_player.cards.push(card);
+            }
+        }
+
+        current_player.update_card_count();
+
+        // Clear active shape demand after drawing
+        match_data.active_shape_demand = None;
+
+        // Advance turn
+        GameEngine::advance_turn(&mut match_data);
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle calling last card
+    async fn handle_call_last_card(&mut self, caller: AccountOwner) {
+        let mut match_data = self.state.match_data.get().clone();
+
+        if let Some(player) = match_data.players.iter_mut().find(|p| p.owner == caller) {
+            player.called_last_card = true;
+        }
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle challenging a player who didn't call last card
+    async fn handle_challenge_last_card(&mut self, _caller: AccountOwner, player_index: usize) {
+        let mut match_data = self.state.match_data.get().clone();
+
+        // Validate player index
+        assert!(
+            player_index < match_data.players.len(),
+            "Invalid player index"
+        );
+
+        let player = &mut match_data.players[player_index];
+
+        // If player has 1 card and didn't call last card, penalty
+        if player.card_count == 1 && !player.called_last_card {
+            // Draw 2 cards as penalty
+            for _ in 0..2 {
+                if let Some(card) = match_data.deck.pop() {
+                    player.cards.push(card);
+                }
+            }
+            player.update_card_count();
+        }
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle player leaving/forfeiting
+    async fn handle_leave_match(&mut self, caller: AccountOwner) {
+        let mut match_data = self.state.match_data.get().clone();
+
+        // Mark player as inactive
+        if let Some(player) = match_data.players.iter_mut().find(|p| p.owner == caller) {
+            player.is_active = false;
+        }
+
+        // Check if only one active player left
+        let active_players: Vec<_> = match_data.players.iter().filter(|p| p.is_active).collect();
+        if active_players.len() == 1 {
+            // Remaining player wins
+            let winner_idx = match_data.players.iter().position(|p| p.is_active).unwrap();
+            match_data.winner_index = Some(winner_idx);
+            match_data.status = MatchStatus::Finished;
+        }
+
+        self.state.match_data.set(match_data);
+    }
+
+    /// Handle remote player join (cross-chain)
+    async fn handle_remote_join(&mut self, player: AccountOwner, nickname: String) {
+        // In V1, we treat this the same as local join
+        self.handle_join_match(player, nickname).await;
+    }
+
+    /// Apply General Market effect (all other players draw 1)
+    fn apply_general_market(match_data: &mut MatchData) {
+        let current_idx = match_data.current_player_index;
+        for (i, player) in match_data.players.iter_mut().enumerate() {
+            if i != current_idx && !match_data.deck.is_empty() {
+                if let Some(card) = match_data.deck.pop() {
+                    player.cards.push(card);
+                    player.update_card_count();
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    // Tests will be added in future iteration
 }
