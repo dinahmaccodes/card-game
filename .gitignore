@@ -3,7 +3,7 @@
 /target/
 # Ignore backend target specifically
 /backend/target/
-
+/docs/code.md
 
 # dependency directories
 /frontend/node_modules/
