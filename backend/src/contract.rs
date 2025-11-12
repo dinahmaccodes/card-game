@@ -112,8 +112,9 @@ impl Contract for LinotContract {
         }
     }
 
-    async fn store(mut self) {
-        self.state.save().await.expect("Failed to save state");
+    async fn store(self) {
+        // State changes are automatically persisted by the framework
+        // No manual save needed when using Views
     }
 }
 
@@ -270,6 +271,18 @@ impl LinotContract {
         // Handle General Market effect if needed
         if let SpecialEffect::AllDrawOne = effect {
             Self::apply_general_market(&mut match_data);
+        }
+
+        // Advance turn based on effect
+        if effect == SpecialEffect::PlayAgain {
+            // Hold On (1): Current player plays again, don't advance
+        } else if effect == SpecialEffect::SkipNext {
+            // Suspension (8): Skip next player by advancing twice
+            GameEngine::advance_turn(&mut match_data);
+            GameEngine::advance_turn(&mut match_data);
+        } else {
+            // Normal: Advance to next player
+            GameEngine::advance_turn(&mut match_data);
         }
 
         self.state.match_data.set(match_data);

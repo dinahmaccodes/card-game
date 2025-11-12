@@ -156,8 +156,8 @@ impl GameEngine {
                 state.pending_penalty = 3;
             }
             SpecialEffect::SkipNext => {
-                // Skip next player (handled by advancing turn twice)
-                Self::advance_turn(state);
+                // Skip next player (handled by advancing turn in contract)
+                // The contract will advance turn twice: once here, once normally
             }
             SpecialEffect::AllDrawOne => {
                 // All other players draw 1 card (handled in contract)
@@ -235,6 +235,7 @@ pub enum SpecialEffect {
 pub enum GameResult {
     /// Player at index won
     Winner(usize),
-    /// Game ended in draw
+    /// Game ended in draw (future feature)
+    #[allow(dead_code)]
     Draw,
 }
