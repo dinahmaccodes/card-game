@@ -5,6 +5,54 @@ use linera_sdk::{
     linera_base_types::AccountOwner,
 };
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+// ============ Error Types ============
+
+#[derive(Debug, Error)]
+pub enum LinotError {
+    #[error("Match already started")]
+    MatchAlreadyStarted,
+    
+    #[error("Match not started")]
+    MatchNotStarted,
+    
+    #[error("Match is full (max {0} players)")]
+    MatchFull(u8),
+    
+    #[error("Player already joined")]
+    PlayerAlreadyJoined,
+    
+    #[error("Only host can start match")]
+    OnlyHostCanStart,
+    
+    #[error("Need at least {0} players to start")]
+    NotEnoughPlayers(usize),
+    
+    #[error("Not your turn")]
+    NotYourTurn,
+    
+    #[error("Invalid card index: {0}")]
+    InvalidCardIndex(usize),
+    
+    #[error("Invalid card play: card doesn't match suit, value, or special requirements")]
+    InvalidCardPlay,
+    
+    #[error("Invalid player index: {0}")]
+    InvalidPlayerIndex(usize),
+    
+    #[error("Match not in progress")]
+    MatchNotInProgress,
+    
+    #[error("No card in discard pile")]
+    NoCardInDiscardPile,
+    
+    #[error("Betting not implemented yet")]
+    BettingNotImplemented,
+    
+    #[error("Caller authentication required")]
+    CallerRequired,
+}
 
 // ============ ABI Definition ============
 
