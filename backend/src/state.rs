@@ -20,7 +20,7 @@ pub struct LinotState {
 
 // ============ Match Configuration ============
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
 pub struct MatchConfig {
     /// Maximum players allowed (2 for V1)
     pub max_players: u8,
@@ -46,7 +46,7 @@ impl Default for MatchConfig {
 
 // ============ Match Data ============
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
 pub struct MatchData {
     /// All players in this match (max 2 for V1)
     pub players: Vec<Player>,
@@ -89,7 +89,7 @@ impl Default for MatchData {
 
 // ============ Player ============
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
 pub struct Player {
     /// Owner account
     pub owner: AccountOwner,
@@ -106,6 +106,7 @@ pub struct Player {
 }
 
 impl Player {
+    #[allow(dead_code)] // Used in contract.rs
     pub fn new(owner: AccountOwner, nickname: String) -> Self {
         Self {
             owner,
@@ -118,6 +119,7 @@ impl Player {
     }
 
     /// Update card count to match actual cards
+    #[allow(dead_code)] // Used in contract.rs
     pub fn update_card_count(&mut self) {
         self.card_count = self.cards.len();
     }
@@ -125,7 +127,7 @@ impl Player {
 
 // ============ Match Status ============
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, async_graphql::Enum)]
 pub enum MatchStatus {
     /// Waiting for players to join
     Waiting,

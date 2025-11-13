@@ -10,6 +10,7 @@ linera-views = "0.15.4"
 futures = { version = "0.3 "}
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
+thiserror = "1.0"
 
 [dev-dependencies]
 linera-sdk = { version = "0.15.4", features = ["test", "wasmer"] }

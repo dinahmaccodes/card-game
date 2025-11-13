@@ -9,7 +9,7 @@ use linera_sdk::{
 
 use crate::game_engine::{GameEngine, GameResult, SpecialEffect};
 use crate::state::{LinotState, MatchConfig, MatchData, MatchStatus, Player};
-use linot::{CardSuit, LinotAbi, Message, Operation};
+use linot::{CardSuit, LinotAbi, LinotError, Message, Operation};
 
 pub struct LinotContract {
     state: LinotState,
@@ -54,61 +54,75 @@ impl Contract for LinotContract {
         let caller = self
             .runtime
             .authenticated_signer()
+            .ok_or(LinotError::CallerRequired)
             .expect("Caller required");
 
-        match operation {
+        let result = match operation {
             Operation::JoinMatch { nickname } => {
-                self.handle_join_match(caller, nickname).await;
+                self.handle_join_match(caller, nickname).await
             }
             Operation::StartMatch => {
-                self.handle_start_match(caller).await;
+                self.handle_start_match(caller).await
             }
             Operation::PlayCard {
                 card_index,
                 chosen_suit,
             } => {
-                self.handle_play_card(caller, card_index, chosen_suit).await;
+                self.handle_play_card(caller, card_index, chosen_suit).await
             }
             Operation::DrawCard => {
-                self.handle_draw_card(caller).await;
+                self.handle_draw_card(caller).await
             }
             Operation::CallLastCard => {
-                self.handle_call_last_card(caller).await;
+                self.handle_call_last_card(caller).await
             }
             Operation::ChallengeLastCard { player_index } => {
-                self.handle_challenge_last_card(caller, player_index).await;
+                self.handle_challenge_last_card(caller, player_index).await
             }
             Operation::LeaveMatch => {
-                self.handle_leave_match(caller).await;
+                self.handle_leave_match(caller).await
             }
             Operation::PlaceBet {
                 player_index: _,
                 amount: _,
             } => {
-                // Placeholder for Wave 4-5 betting
-                panic!("Betting not implemented in V1");
+                Err(LinotError::BettingNotImplemented)
             }
+        };
+
+        // Panic on error to maintain existing behavior
+        // TODO: Return Result from execute_operation in future
+        if let Err(e) = result {
+            panic!("Operation failed: {}", e);
         }
     }
 
     async fn execute_message(&mut self, message: Self::Message) {
-        match message {
+        let result = match message {
             Message::InvitePlayer {
                 inviter: _,
                 match_id: _,
             } => {
                 // Cross-chain invitation (Wave 3)
                 // For V1, we don't implement cross-chain invites
+                Ok(())
             }
             Message::PlayerJoined { player, nickname } => {
-                self.handle_remote_join(player, nickname).await;
+                self.handle_remote_join(player, nickname).await
             }
             Message::StateUpdate {
                 current_player: _,
                 top_card: _,
             } => {
                 // Broadcast state update (for spectators)
+                Ok(())
             }
+        };
+
+        // Silently ignore message errors for now
+        // Messages are non-critical and shouldn't crash the chain
+        if let Err(_e) = result {
+            // Error ignored - could be logged in production
         }
     }
 
@@ -120,51 +134,51 @@ impl Contract for LinotContract {
 
 impl LinotContract {
     /// Handle player joining the match
-    async fn handle_join_match(&mut self, caller: AccountOwner, nickname: String) {
+    async fn handle_join_match(&mut self, caller: AccountOwner, nickname: String) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
         let config = self.state.config.get().clone();
 
         // Validate: match must be waiting
-        assert_eq!(
-            match_data.status,
-            MatchStatus::Waiting,
-            "Match already started"
-        );
+        if match_data.status != MatchStatus::Waiting {
+            return Err(LinotError::MatchAlreadyStarted);
+        }
 
         // Validate: not at max players
-        assert!(
-            match_data.players.len() < config.max_players as usize,
-            "Match is full"
-        );
+        if match_data.players.len() >= config.max_players as usize {
+            return Err(LinotError::MatchFull(config.max_players));
+        }
 
         // Validate: player not already joined
-        assert!(
-            !match_data.players.iter().any(|p| p.owner == caller),
-            "Already joined"
-        );
+        if match_data.players.iter().any(|p| p.owner == caller) {
+            return Err(LinotError::PlayerAlreadyJoined);
+        }
 
         // Add player
         match_data.players.push(Player::new(caller, nickname));
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle starting the match
-    async fn handle_start_match(&mut self, caller: AccountOwner) {
+    async fn handle_start_match(&mut self, caller: AccountOwner) -> Result<(), LinotError> {
         let config = self.state.config.get().clone();
         let mut match_data = self.state.match_data.get().clone();
 
         // Validate: only host can start
-        assert_eq!(caller, config.host, "Only host can start match");
+        if caller != config.host {
+            return Err(LinotError::OnlyHostCanStart);
+        }
 
         // Validate: enough players (2 for V1)
-        assert_eq!(match_data.players.len(), 2, "Need exactly 2 players");
+        if match_data.players.len() < 2 {
+            return Err(LinotError::NotEnoughPlayers(2));
+        }
 
         // Validate: match is waiting
-        assert_eq!(
-            match_data.status,
-            MatchStatus::Waiting,
-            "Match already started"
-        );
+        if match_data.status != MatchStatus::Waiting {
+            return Err(LinotError::MatchAlreadyStarted);
+        }
 
         // Create and shuffle deck
         let mut deck = GameEngine::create_deck();
@@ -190,6 +204,8 @@ impl LinotContract {
         match_data.current_player_index = 0;
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle playing a card
@@ -198,25 +214,24 @@ impl LinotContract {
         caller: AccountOwner,
         card_index: usize,
         chosen_suit: Option<CardSuit>,
-    ) {
+    ) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
 
         // Validate: match is in progress
-        assert_eq!(
-            match_data.status,
-            MatchStatus::InProgress,
-            "Match not in progress"
-        );
+        if match_data.status != MatchStatus::InProgress {
+            return Err(LinotError::MatchNotInProgress);
+        }
 
         // Validate: it's caller's turn
         let current_player = &mut match_data.players[match_data.current_player_index];
-        assert_eq!(current_player.owner, caller, "Not your turn");
+        if current_player.owner != caller {
+            return Err(LinotError::NotYourTurn);
+        }
 
         // Validate: card index is valid
-        assert!(
-            card_index < current_player.cards.len(),
-            "Invalid card index"
-        );
+        if card_index >= current_player.cards.len() {
+            return Err(LinotError::InvalidCardIndex(card_index));
+        }
 
         // Get the card
         let card = current_player.cards[card_index].clone();
@@ -225,18 +240,17 @@ impl LinotContract {
         let top_card = match_data
             .discard_pile
             .last()
-            .expect("No card in discard pile");
+            .ok_or(LinotError::NoCardInDiscardPile)?;
 
         // Validate: card can be played
-        assert!(
-            GameEngine::is_valid_play(
-                &card,
-                top_card,
-                match_data.active_shape_demand,
-                match_data.pending_penalty,
-            ),
-            "Invalid play"
-        );
+        if !GameEngine::is_valid_play(
+            &card,
+            top_card,
+            match_data.active_shape_demand,
+            match_data.pending_penalty,
+        ) {
+            return Err(LinotError::InvalidCardPlay);
+        }
 
         // Remove card from hand
         current_player.cards.remove(card_index);
@@ -286,16 +300,20 @@ impl LinotContract {
         }
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle drawing a card
-    async fn handle_draw_card(&mut self, caller: AccountOwner) {
+    async fn handle_draw_card(&mut self, caller: AccountOwner) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
 
         // Validate: it's caller's turn
         let current_player_idx = match_data.current_player_index;
         let current_player = &mut match_data.players[current_player_idx];
-        assert_eq!(current_player.owner, caller, "Not your turn");
+        if current_player.owner != caller {
+            return Err(LinotError::NotYourTurn);
+        }
 
         // Determine how many cards to draw
         let cards_to_draw = if match_data.pending_penalty > 0 {
@@ -339,10 +357,12 @@ impl LinotContract {
         GameEngine::advance_turn(&mut match_data);
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle calling last card
-    async fn handle_call_last_card(&mut self, caller: AccountOwner) {
+    async fn handle_call_last_card(&mut self, caller: AccountOwner) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
 
         if let Some(player) = match_data.players.iter_mut().find(|p| p.owner == caller) {
@@ -350,17 +370,18 @@ impl LinotContract {
         }
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle challenging a player who didn't call last card
-    async fn handle_challenge_last_card(&mut self, _caller: AccountOwner, player_index: usize) {
+    async fn handle_challenge_last_card(&mut self, _caller: AccountOwner, player_index: usize) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
 
         // Validate player index
-        assert!(
-            player_index < match_data.players.len(),
-            "Invalid player index"
-        );
+        if player_index >= match_data.players.len() {
+            return Err(LinotError::InvalidPlayerIndex(player_index));
+        }
 
         let player = &mut match_data.players[player_index];
 
@@ -376,10 +397,12 @@ impl LinotContract {
         }
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle player leaving/forfeiting
-    async fn handle_leave_match(&mut self, caller: AccountOwner) {
+    async fn handle_leave_match(&mut self, caller: AccountOwner) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
 
         // Mark player as inactive
@@ -397,12 +420,14 @@ impl LinotContract {
         }
 
         self.state.match_data.set(match_data);
+        
+        Ok(())
     }
 
     /// Handle remote player join (cross-chain)
-    async fn handle_remote_join(&mut self, player: AccountOwner, nickname: String) {
+    async fn handle_remote_join(&mut self, player: AccountOwner, nickname: String) -> Result<(), LinotError> {
         // In V1, we treat this the same as local join
-        self.handle_join_match(player, nickname).await;
+        self.handle_join_match(player, nickname).await
     }
 
     /// Apply General Market effect (all other players draw 1)

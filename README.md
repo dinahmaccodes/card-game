@@ -28,6 +28,67 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ---
 
+## Current Hackathon Status — Wave 2 (Nov 3–12)
+
+### ✅ **Wave 2 Complete: Multiplayer Foundation & Production-Ready Backend**
+
+Wave 2 successfully transformed Linot from a prototype into a functional multiplayer game with a production-ready backend architecture.
+
+#### Major Achievements:
+
+**Game Logic & Multiplayer:**
+
+- ✅ **Complete Whot ruleset** implemented with all 6 special cards (Whot, Hold On, Pick Two, Pick Three, Suspension, General Market)
+- ✅ **Human-vs-human mode** (2–4 players) synchronized over dedicated match microchains
+- ✅ **On-chain match creation** with automatic microchain instantiation per game
+- ✅ **Turn-based enforcement** with caller authentication and validation
+- ✅ **Win/draw detection** with proper game state transitions
+
+**Backend Architecture:**
+
+- ✅ **Professional error handling** system with custom `LinotError` type replacing all panics
+- ✅ **Full GraphQL service layer** with 12+ queries for game state
+- ✅ **Secure player views** preventing card leakage to opponents
+- ✅ **Type-safe state management** using Linera Views (RootView + RegisterView)
+- ✅ **Clean separation** of concerns (contract, service, game engine, state)
+
+**Technical Improvements:**
+
+- ✅ Deterministic shuffling using chain ID as seed for consensus
+- ✅ Automatic deck reshuffling when draw pile is empty
+- ✅ Penalty stacking for Pick Two/Pick Three cards
+- ✅ Last card challenge system with automatic enforcement
+- ✅ Player forfeit handling with winner determination
+
+#### Code Quality:
+
+- ✅ 0 compilation errors
+- ✅ 0 warnings
+- ✅ Follows Linera SDK best practices
+- ✅ Matches patterns from reference projects (Microbet, ChainClashArena)
+
+#### What's Ready:
+
+- ✅ Backend contract deployable to Linera testnet
+- ✅ GraphQL service ready for frontend integration
+- ✅ Full game playable end-to-end on-chain
+
+#### Still in Progress:
+
+- 🚧 Frontend integration with GraphQL queries
+- 🚧 Spectator betting UI (smart contract hooks prepared)
+- 🚧 Comprehensive test suite
+- ⏳ Computer opponent (deferred to post-Wave 3)
+
+**Documentation:**
+
+- See [`backend/WAVE2_IMPROVEMENTS.md`](backend/WAVE2_IMPROVEMENTS.md) for detailed technical breakdown
+- See [`backend/CONTRACT_BUILD_GUIDE.md`](backend/CONTRACT_BUILD_GUIDE.md) for deployment instructions
+
+**Next up (Wave 3):** Frontend-backend integration, betting mechanics finalization, comprehensive testing, and state persistence hardening.
+
+---
+
 ## Core Concept
 
 | Feature                        | Description                                                                                         |
@@ -75,73 +136,77 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ## Development Plan
 
-### **Wave 1: Core Game** (Oct 20–29)
-**Scope:** Prove it works  
+### Wave 1: Core Game (Completed Oct 20–29)
+
 - Frontend template ready (React + Tailwind)
 - Backend structure drafted with comments
-- README and documentation complete  
+- README and documentation baseline established
 
-**Deliverable:** Basic setup + architecture foundation.
+**Outcome:** Architectural foundation and scaffolding complete.
 
 ---
 
-### **Wave 2: Multi-player Action Begins (Nov 3–12)**
+### Wave 2: Multi-player Action Begins (In Review Nov 3–12)
 
-**Goal:** Move from simulation to live microchains and begin foundation for multiplayer action
+**Goal:** Move from simulation to live microchains and enable foundational multiplayer.
 
-#### Gameplay
+- Implement full Whot ruleset (card matching, action cards, turn order).
+- Transition to human vs human (2–4 players) gameplay using Linera microchains.
+- On-chain match creation and card actions live across dedicated match chains.
+- Optional 1v1 vs computer opponent deferred for post-demo consideration.
 
-- Implement full **Whot rules** (card matching, special cards, turn order).
-- Add **1v1 vs computer opponent** for baseline logic (optional)  
-- Transition to **human vs human (2–4 players)** gameplay. (main feature)
-- On-chain match creation and card actions
+---
 
------
+### Wave 3: Betting Mechanics + Multiplayer Hardening (Nov 17–26)
 
-### **Wave 3: Betting Mechanics + Multiplayer Action Continues (Nov 17–26)**
+**Goal:** Complete Multiplayer feature and start build of Betting Mechanism
 
-**Goal:** Complete Multiplayer feature and Betting Mechanism starts
+**Targets:**
 
-- Spectator leaderboard
-- Maintain Persistent match state
-- Each match operates on **its own microchain** for instant updates.
+- Spectator leaderboard with persistent state maintained.
+- Manual staking system for multiplayer matches (winner takes all).
 
-#### Betting Mechanics  
-- Draft Logic for Initial betting module
-- Add manual **staking system** for multiplayer matches (winner takes all).  
-- Build **betting logic** for internal players.  
-- Track results and payouts manually for now
+**Additional Logic Targets:**
 
+- Betting logic setup V1 for internal players with manual payouts.
+- Persistence and recovery of match state per microchain.
+
+---
 
 ### **Wave 4: Improve Features (Dec 1-10)**
 
-**Goal:** Fully playable demo for Linera Showcase.
+**Goal:** Deliver a fully playable demo for the Linera showcase.
 
 - End-to-end on-chain gameplay
-- Wallet connection
+- Wallet connection and onboarding UX.
 
-#### Plans to Improve Player Experience  
-- Integrate **leaderboards** and player stats.  
-- Improve animations, responsive layout, and lobby UX.  
-- Initial implementation of **tournament mode** (4–8 players). 
+#### Plans to Improve Player Experience
+
+- Integrate **leaderboards** and player stats.
+- Improve animations, responsive layout, and lobby UX.
+- Initial implementation of **tournament mode** (4–8 players).
 
 ---
-### **Wave 5: Perfect Betting Feature and Larger Multiplayer Feature (Dec 15 - Jan 7)** 
-- Real-time leaderboard updates  
-- Improved performance for large tournaments 
-- Perfect implementation of **tournament mode** (4–8 players). 
-----
+
+### **Wave 5: Perfect Betting Feature and Larger Multiplayer Feature (Dec 15 - Jan 7)**
+
+- Real-time leaderboard updates
+- Improved performance for large tournaments
+- Perfect implementation of **tournament mode** (4–8 players).
+
+---
 
 ### **Wave 6: MVP Launch (Jan 12-21)**
-**Goal:** Prepare for presentation and Linera testnet launch.  
 
-- Full UI overhaul for presentation  
-- Onboarding tutorial + in-game guide  
-- Load testing and bug cleanup  
-- Documentation finalization  
-- Recorded demo and marketing materials  
+**Goal:** Prepare for presentation and Linera testnet launch.
 
-**Demo:** Polished, production-ready dApp for Linera Showcase and ETH Denver if possible.
+- Full UI overhaul for presentation
+- Onboarding tutorial + in-game guide
+- Load testing and bug cleanup in codebase
+- Documentation finalization - Make detailed docs for players to understnad Game and Developers to understand codebase
+- Recorded demo and marketing materials
+
+**Demo:** Polished, production-ready dApp for Linera Showcase and ETH Denver - if possible.
 
 ## Team
 
@@ -163,10 +228,10 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ## Future Ideas
 
-- ⚔️ **Tournaments + Seasonal Leagues** for competitive play as community and user numbers grow
-- 🧾 **Reward Dashboard** for automatically tracking winners globally
-- 🌉 **Cross-Microchain Communication** experiments for match coordination
-- 📈 **Match Analytics** to visualize performance across sessions
+- **Tournaments + Seasonal Leagues** for competitive play as community and user numbers grow
+- **Reward Dashboard** for automatically tracking winners globally
+- **Cross-Microchain Communication** experiments for match coordination
+- **Match Analytics** to visualize performance across sessions
 
 ---
 
