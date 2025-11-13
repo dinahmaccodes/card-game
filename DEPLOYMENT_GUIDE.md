@@ -1,6 +1,6 @@
 # Linot Card Game - Deployment Guide
 
-## 🎯 Based on Linera Buildathon Template
+## Based on Linera Buildathon Template
 
 This guide is based on the official Linera buildathon template and explains how to build, test, and deploy the Linot card game application.
 

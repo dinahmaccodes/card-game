@@ -30,7 +30,7 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 ## Current Hackathon Status — Wave 2 (Nov 3–12)
 
-### ✅ **Wave 2 Complete: Multiplayer Foundation & Production-Ready Backend**
+### **Wave 2 Complete: Multiplayer Foundation & Production-Ready Backend**
 
 Wave 2 successfully transformed Linot from a prototype into a functional multiplayer game with a production-ready backend architecture.
 
@@ -38,52 +38,47 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 **Game Logic & Multiplayer:**
 
-- ✅ **Complete Whot ruleset** implemented with all 6 special cards (Whot, Hold On, Pick Two, Pick Three, Suspension, General Market)
-- ✅ **Human-vs-human mode** (2–4 players) synchronized over dedicated match microchains
-- ✅ **On-chain match creation** with automatic microchain instantiation per game
-- ✅ **Turn-based enforcement** with caller authentication and validation
-- ✅ **Win/draw detection** with proper game state transitions
+- **Complete Whot ruleset** implemented with all 6 special cards (Whot, Hold On, Pick Two, Pick Three, Suspension, General Market)
+- **Human-vs-human mode** (2–4 players) synchronized over dedicated match microchains
+- **On-chain match creation** with automatic microchain instantiation per game
+- **Turn-based enforcement** with caller authentication and validation
+- **Win/draw detection** with proper game state transitions
 
 **Backend Architecture:**
 
-- ✅ **Professional error handling** system with custom `LinotError` type replacing all panics
-- ✅ **Full GraphQL service layer** with 12+ queries for game state
-- ✅ **Secure player views** preventing card leakage to opponents
-- ✅ **Type-safe state management** using Linera Views (RootView + RegisterView)
-- ✅ **Clean separation** of concerns (contract, service, game engine, state)
+- **Professional error handling** system with custom `LinotError` type replacing all panics
+- **Full GraphQL service layer** with 12+ queries for game state
+- **Secure player views** preventing card leakage to opponents
+- **Type-safe state management** using Linera Views (RootView + RegisterView)
+- **Clean separation** of concerns (contract, service, game engine, state)
 
 **Technical Improvements:**
 
-- ✅ Deterministic shuffling using chain ID as seed for consensus
-- ✅ Automatic deck reshuffling when draw pile is empty
-- ✅ Penalty stacking for Pick Two/Pick Three cards
-- ✅ Last card challenge system with automatic enforcement
-- ✅ Player forfeit handling with winner determination
+- Deterministic shuffling using chain ID as seed for consensus
+- Automatic deck reshuffling when draw pile is empty
+- Penalty stacking for Pick Two/Pick Three cards
+- Last card challenge system with automatic enforcement
+- Player forfeit handling with winner determination
 
 #### Code Quality:
 
-- ✅ 0 compilation errors
-- ✅ 0 warnings
-- ✅ Follows Linera SDK best practices
-- ✅ Matches patterns from reference projects (Microbet, ChainClashArena)
+- 0 compilation errors
+- 0 warnings
+- Follows Linera SDK best practices
+- Matches patterns from reference projects (Microbet, ChainClashArena)
 
 #### What's Ready:
 
-- ✅ Backend contract deployable to Linera testnet
-- ✅ GraphQL service ready for frontend integration
-- ✅ Full game playable end-to-end on-chain
+- Backend contract deployable to Linera testnet
+- GraphQL service ready for frontend integration
+- Full game playable end-to-end on-chain
 
-#### Still in Progress:
+#### Still in Progress - To Be worked on for Wave 3:
 
-- 🚧 Frontend integration with GraphQL queries
-- 🚧 Spectator betting UI (smart contract hooks prepared)
-- 🚧 Comprehensive test suite
-- ⏳ Computer opponent (deferred to post-Wave 3)
-
-**Documentation:**
-
-- See [`backend/WAVE2_IMPROVEMENTS.md`](backend/WAVE2_IMPROVEMENTS.md) for detailed technical breakdown
-- See [`backend/CONTRACT_BUILD_GUIDE.md`](backend/CONTRACT_BUILD_GUIDE.md) for deployment instructions
+-  Frontend integration with GraphQL queries
+-  Spectator betting UI (smart contract hooks prepared)
+-  Comprehensive test suite
+-  Computer opponent (deferred to post-Wave 3)
 
 **Next up (Wave 3):** Frontend-backend integration, betting mechanics finalization, comprehensive testing, and state persistence hardening.
 
@@ -146,14 +141,13 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ---
 
-### Wave 2: Multi-player Action Begins (In Review Nov 3–12)
+### Wave 2: Multi-player Action Begins (Completed within Nov 3–12)
 
 **Goal:** Move from simulation to live microchains and enable foundational multiplayer.
 
 - Implement full Whot ruleset (card matching, action cards, turn order).
 - Transition to human vs human (2–4 players) gameplay using Linera microchains.
 - On-chain match creation and card actions live across dedicated match chains.
-- Optional 1v1 vs computer opponent deferred for post-demo consideration.
 
 ---
 
