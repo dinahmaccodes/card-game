@@ -1,6 +1,6 @@
 # Linot Card Game - Backend (Smart Contract)
 
-## 🎯 Project Overview
+## Project Overview
 
 This is a **Linera blockchain smart contract** implementing a two-player Whot/Linot card game (PvP). The game is fully on-chain, using Linera's microchains architecture for fast, scalable gameplay.
 
@@ -11,7 +11,7 @@ This is a **Linera blockchain smart contract** implementing a two-player Whot/Li
 
 ---
 
-## 📁 Project Structure
+## Structure
 
 ```
 backend/
@@ -30,7 +30,7 @@ backend/
 
 ---
 
-## 🧩 File-by-File Breakdown
+## File-by-File Breakdown
 
 ### **1. `src/lib.rs` - Public Interface (ABI)**
 
@@ -333,7 +333,7 @@ Sets `called_last_card = true` for caller.
 
 ---
 
-## 🎮 Game Flow Example
+## Game Flow Example
 
 ### **Setup Phase:**
 
@@ -382,7 +382,7 @@ Sets `called_last_card = true` for caller.
 
 ---
 
-## 🔑 Key Linera Concepts Used
+## Key Linera Concepts Used
 
 ### **1. Views (Persistent Storage)**
 
@@ -423,7 +423,7 @@ let caller = self.runtime.authenticated_signer().expect("Caller required");
 
 ---
 
-## 🚀 Building and Deployment
+## Building and Deployment
 
 ### **Build WASM Binaries:**
 
@@ -463,7 +463,7 @@ linera execute-operation \
 
 ---
 
-## 📊 State Management Diagram
+## State Management Diagram
 
 ```
 ┌─────────────────────────────────────────┐
@@ -499,9 +499,6 @@ linera execute-operation \
 
 ---
 
-## 🐛 Debugging Tips
-
-### **Common Errors:**
 
 **"Not your turn"**
 
@@ -552,16 +549,16 @@ query {
 
 ---
 
-## 🎯 Next Steps (V1 → V2+)
+## Next Steps (V1 → V2+)
 
 **Current V1 Features:**
 
-- ✅ 2-player PvP
-- ✅ All special cards working
-- ✅ Win/draw detection
-- ✅ Auto last-card calling
-- ✅ Deterministic shuffling
-
+- 2-player PvP
+- All special cards working
+- Win/draw detection
+- Auto last-card calling
+- Deterministic shuffling
+ 
 **Future Enhancements:**
 
 - **Wave 2**: 3-6 player support
@@ -572,20 +569,9 @@ query {
 
 ---
 
-## 📚 References
+##  Architecture Logic
 
-- **Linera SDK Docs**: https://linera.dev
-- **Whot Rules**: `docs/backend_whot_rules.md`
-- **Game Logic Guide**: `docs/building_logic_v1.md`
-- **Reference Projects**:
-  - Microbet: https://github.com/egorble/Microbet
-  - ChainClashArena: https://github.com/dinitheth/ChainClashArena
-
----
-
-## 💡 Architecture Philosophy
-
-**Why Linera for a Card Game?**
+**Why Use Linera for a Card Game?**
 
 1. **Instant Finality**: Moves confirmed in <0.5s
 2. **Horizontal Scaling**: Each game = separate microchain
