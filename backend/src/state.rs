@@ -25,7 +25,7 @@ pub struct MatchConfig {
     /// Maximum players allowed (2 for V1)
     pub max_players: u8,
     /// Host account who created the match
-    pub host: AccountOwner,
+    pub host: Option<AccountOwner>,
     /// Whether this is a ranked/competitive match
     pub is_ranked: bool,
     /// Strict mode: must draw if no valid move
@@ -36,8 +36,7 @@ impl Default for MatchConfig {
     fn default() -> Self {
         Self {
             max_players: 2,
-            // Use the reserved CHAIN constant as default placeholder
-            host: AccountOwner::CHAIN,
+            host: None,
             is_ranked: false,
             strict_mode: false,
         }

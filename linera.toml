@@ -1,0 +1,10 @@
+[project]
+name = "linot"
+
+[[contract]]
+name = "backend"
+path = "backend"
+
+[contract.binaries]
+contract = "backend_contract"
+service = "backend_service"
