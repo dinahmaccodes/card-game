@@ -9,12 +9,12 @@
 
 ---
 
-## 🚀 **Try It Now** (10 minutes)
+## **Try It Now** (10 minutes)
 
 **Want to test the production-ready backend on your machine?**
 
-👉 **[Quick Test Guide](./TEST_THIS_NOW.md)** - One-page checklist  
-👉 **[Detailed Testing](./docs/QUICK_TEST.md)** - Step-by-step walkthrough
+**[Quick Test Guide](./TEST_THIS_NOW.md)** - One-page checklist  
+ **[Detailed Testing](./docs/QUICK_TEST.md)** - Step-by-step walkthrough
 
 **What you'll test:**
 
@@ -97,7 +97,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 #### Still in Progress - To Be worked on for Wave 3
 
 - **GraphQL mutations** - Expose operations (JoinMatch, StartMatch, PlayCard) via mutations
-- **Frontend-backend integration** - Connect React UI to smart contract 
+- **Frontend-backend integration** - Connect React UI to smart contract
 - **Live gameplay demo** - Full 2-player match with real-time updates
 - **Spectator betting UI** - (smart contract hooks prepared)
 - **Comprehensive test suite**
@@ -126,7 +126,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ---
 
-## Core Concept and Aim for Linot as a Game 
+## Core Concept and Aim for Linot as a Game
 
 | Feature                        | Description                                                                                         |
 | ------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -159,13 +159,13 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ## Technical Architecture
 
-| Layer                  | Stack                                                                 |
-| ---------------------- | --------------------------------------------------------------------- |
-| **Frontend**           | React + Vue + TypeScript + TailwindCSS                                |
-| **State Management**   | Zustand (client) + Linera for on-chain state                          |
-| **Blockchain Backend** | Linera Microchains (one microchain per match)                         |
-| **Real-Time Updates**  | GraphQL Subscriptions                                                 |
-| **Smart Contracts**    | Rust (Linera SDK)                                                     |
+| Layer                  | Stack                                         |
+| ---------------------- | --------------------------------------------- |
+| **Frontend**           | React + Vue + TypeScript + TailwindCSS        |
+| **State Management**   | Zustand (client) + Linera for on-chain state  |
+| **Blockchain Backend** | Linera Microchains (one microchain per match) |
+| **Real-Time Updates**  | GraphQL Subscriptions                         |
+| **Smart Contracts**    | Rust (Linera SDK)                             |
 
 ---
 
@@ -254,12 +254,12 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ## Documentation
 
-** [Complete Documentation Index](docs/DOCUMENTATION_INDEX.md)** - All guides organized by use case
+**[Complete Documentation Index](docs/DOCUMENTATION_INDEX.md)** - All guides organized by use case
 
 ### Quick Start
 
-- **[ Quick Testing Guide](docs/QUICK_TEST.md)** - **START HERE!** Test the backend in 10 minutes (step-by-step)
-- **[ One-Page Checklist](TEST_THIS_NOW.md)** - Fastest way to test (copy-paste commands)
+- **[Quick Testing Guide](docs/QUICK_TEST.md)** - **START HERE!** Test the backend in 10 minutes (step-by-step)
+- **[One-Page Checklist](TEST_THIS_NOW.md)** - Fastest way to test (copy-paste commands)
 
 ### For Developers
 
@@ -298,8 +298,8 @@ cd linot-card-game/backend
 cargo build --target wasm32-unknown-unknown --release
 cd ..
 
-# Step 3: Deploy the application 
-# App ID will be retured as part of the output at the top - Take note of it 
+# Step 3: Deploy the application
+# App ID will be retured as part of the output at the top - Take note of it
 linera publish-and-create \
   backend/target/wasm32-unknown-unknown/release/backend_contract.wasm \
   backend/target/wasm32-unknown-unknown/release/backend_service.wasm \
@@ -334,13 +334,14 @@ See **[TESTING_BACKEND.md](docs/TESTING_BACKEND.md)** for complete testing instr
 
 A functional frontend demo is available at [linot.vercel.app](https://linot.vercel.app), showcasing the intended user experience.
 
-**Note:** The demo is currently **not connected to the backend**. 
+**Note:** The demo is currently **not connected to the backend**.
 This is meant to demonstrate the UI/UX design and game flow. Backend integration (connecting React to GraphQL API) is in progress for Wave 3.
 
-## More on Design 
+## More on Design
 
-Here is a sample of what our Pitch Deck is and a sneak-peek of our UI as we build
+Here is a sample of what our Pitch Deck is for V2 and a sneak-peek of our UI as we build
 
+<https://www.figma.com/proto/4dgqc4TA9XoNoUNmy1xerT/Hackathon-Projects?page-id=1082%3A2&node-id=1500-3855&viewport=-914%2C-819%2C0.14&t=elRcK2nTS8Jmronp-1&scaling=scale-down-width&content-scaling=fixed>
 
 ---
 
