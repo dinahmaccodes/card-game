@@ -157,8 +157,14 @@ const Game: React.FC = () => {
       >
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-ember-500 to-ember-700 rounded-xl flex items-center justify-center shadow-lg glow-ember">
-            <span className="text-white text-xl font-bold">L</span>
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center">
+            <span className="text-white text-xl font-bold">
+              <img
+                src="/full symbol.png"
+                alt="linot"
+                className="w-full h-full object-contain"
+              />
+            </span>
           </div>
           <h1 className="font-display text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-ember-400 to-ember-600">
             Linot
@@ -256,7 +262,14 @@ const Game: React.FC = () => {
 
               {/* Main Deck */}
               <div className="relative w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-40 bg-gradient-to-br from-ember-600 via-ember-700 to-ember-900 rounded-xl shadow-2xl flex flex-col items-center justify-center border-2 border-ember-500/50">
-                <div className="text-white text-4xl sm:text-5xl mb-2">🃏</div>
+                <div className="w-16 h-16 mb-2">
+                  {" "}
+                  <img
+                    src="/full symbol.png"
+                    alt="linot"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
                 <div className="text-ember-200 font-bold text-lg">
                   {deck.length}
                 </div>
@@ -279,7 +292,7 @@ const Game: React.FC = () => {
                     animate={{ scale: 1, rotate: 0, opacity: 1 }}
                     exit={{ scale: 0, rotate: -180, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 200 }}
-                    className="glow-ember-strong"
+                    // className="glow-ember-strong"
                   >
                     <CardComponent card={lastPlayedCard} />
                   </motion.div>

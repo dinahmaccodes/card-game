@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Titan+One&family=Baloo+2:wght@400;500;600;700;800&display=swap');
+
 @import "tailwindcss";
 
 @theme {
   /* Font Families */
-  --font-family-display: "Baloo 2", cursive;
-  --font-family-body: "Inter", sans-serif;
-  --font-family-ui: "Titan-one";
+  --font-baloo: "Baloo 2", cursive;
+  --font-inter: "Inter", sans-serif;
+  --font-titan: "Titan One", cursive;
 
   /* Premium Dark Gaming Palette */
   --color-void-950: #0a0a0f;
@@ -21,9 +23,10 @@
   --color-ember-400: #ff6b4a;
   --color-ember-500: #ff3d1f;
   --color-ember-600: #e62912;
-  --color-ember-700: #c01f0d;
+  --color-ember-700: #E23A2F;
   --color-ember-800: #991a0f;
   --color-ember-900: #7d1912;
+  /* --color-ember-700: #c01f0d; */
 
   /* Soft Accents for Cards */
   --color-azure: #60a5fa;
@@ -38,7 +41,7 @@
 }
 
 :root {
-  font-family: var(--font-family-body);
+  font-family: var(--font-baloo);
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
