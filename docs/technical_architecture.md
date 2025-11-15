@@ -36,18 +36,20 @@
 
 linot/
 ├── backend/                    # On-chain logic
-│   ├── Cargo.toml
-│   ├── src/
-│   │   ├── lib.rs              # ABI + Operations definitions
-│   │   ├── state.rs            # Application state (views) - Game state struct
-│   │   ├── contract.rs         # Contract logic (mutations)
-│   │   ├── service.rs          # GraphQL service (queries)
-│   │   └── game.rs             # Game rules engine - Whot game rules
-│   └── tests/
-│       └── single_chain.rs     # Integration tests
+├── Cargo.lock
+├── Cargo.toml
+├── rust-toolchain.toml
+├── src
+│   ├── contract.rs
+│   ├── lib.rs                  # ABI + Operations definitions
+│   ├── service.rs              # GraphQL service (queries)
+│   └── state.rs                # Application state (views) - Game state struct
+└── tests
+|   └── single_chain.rs         # Integration tests
+|
 └── frontend/
     └── src/
         ├── components/
         ├── hooks/
         └── graphql/
-```
+

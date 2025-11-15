@@ -1,0 +1,87 @@
+### Rust/Cargo
+# Ignore build artifacts
+/target/
+# Ignore backend target specifically
+/backend/target/
+# Ignore doc files for personal build purposes
+/docs/code.md
+/docs/WAVE2_IMPROVEMENTS.
+/docs/IMPLEMENTATION_SUMMARY.md
+/docs/CONTRACT_BUILD_GUIDE.md
+/docs/demo_present_sample.md
+DEPLOYMENT_GUIDE.md
+GRAPHQL_API.md
+WAVE2_CHECKLIST.md
+WAVE2_SUMMARY.md
+WAVE2_IMPROVEMENTS.md
+
+/linera-protocol/
+# dependency directories
+/frontend/node_modules/
+
+# build output
+/frontend/dist/
+/dist/
+
+# package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+### Environment files
+# dotenv files often contain secrets or credentials
+.env
+.env.*.local
+.env.local
+.env.production.local
+
+### Logs
+logs
+*.log
+*.log.*
+
+### Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+### OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Temporary / build caches
+.cache/
+dist/
+coverage/
+coverage/**
+
+### Key and certificate files
+*.pem
+*.key
+*.crt
+
+### Database files
+*.sqlite
+*.sqlite3
+*.db
+
+### Other common ignores
+/.cargo/bin/
+target/debug/
+target/release/
+
+# Editor swap/backup files
+*~
+# Vim
+.swp
+.swo
+
+# JetBrains
+*.iml
+out/
+
+
+

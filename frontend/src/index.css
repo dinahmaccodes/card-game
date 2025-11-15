@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-
-
 @theme {
   /* Font Families */
   --font-family-display: "Baloo 2", cursive;
@@ -56,33 +54,39 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  /* Allow vertical scrolling (needed on small/mobile screens) while
+     preventing horizontal overflow. Previously `overflow: hidden` blocked
+     scrolling entirely on mobile. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Landscape Mode Enforcement for Mobile */
 @media screen and (max-width: 768px) and (orientation: portrait) {
-body::before {
-  content: "📱 Please rotate your device";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #0a0a0f, #13131a);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* allow content to start from top */
-  font-family: var(--font-family-display);
-  font-size: 1.5rem;
-  text-align: center;
-  padding: 2rem;
-  z-index: 99999;
-  gap: 1rem;
-  overflow-y: auto; /* allow vertical scrolling */
-}
-
+  body::before {
+    content: "📱 Please rotate your device";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #0a0a0f, #13131a);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-display);
+    font-size: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+    z-index: 99999;
+    gap: 1rem;
+    /* Make the overlay non-interactive so touches/scrolls pass through
+     to the page underneath (allows scrolling while the rotate message is shown). */
+    pointer-events: none;
+  }
 
   body::after {
     content: "This game is best played in landscape mode";
@@ -95,6 +99,28 @@ body::before {
     color: rgba(255, 255, 255, 0.6);
     z-index: 99999;
     padding: 0 2rem;
+    /* Also non-interactive so touch gestures are handled by the page. */
+    pointer-events: none;
+  }
+}
+
+/* When on small devices in landscape, allow the main game container to scroll
+   vertically so players can pan to see their cards and opponents' areas. */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .game-root,
+  .dashboard-root {
+    /* allow vertical scrolling */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    /* let the container grow taller than the viewport so it can be scrolled */
+    height: auto !important;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure the content inside can expand and not be clipped by fixed heights */
+  .game-root .flex-1 {
+    min-height: 0;
   }
 }
 
@@ -127,20 +153,17 @@ body::before {
 
 /* Glow Effects */
 .glow-ember {
-  box-shadow: 0 0 20px rgba(255, 61, 31, 0.3),
-              0 0 40px rgba(255, 61, 31, 0.1);
+  box-shadow: 0 0 20px rgba(255, 61, 31, 0.3), 0 0 40px rgba(255, 61, 31, 0.1);
 }
 
 .glow-ember-strong {
-  box-shadow: 0 0 30px rgba(255, 61, 31, 0.5),
-              0 0 60px rgba(255, 61, 31, 0.2),
-              0 0 90px rgba(255, 61, 31, 0.1);
+  box-shadow: 0 0 30px rgba(255, 61, 31, 0.5), 0 0 60px rgba(255, 61, 31, 0.2),
+    0 0 90px rgba(255, 61, 31, 0.1);
 }
 
 /* Card Table Texture */
 .felt-texture {
-  background: 
-    linear-gradient(135deg, #1c1c26 0%, #13131a 100%),
+  background: linear-gradient(135deg, #1c1c26 0%, #13131a 100%),
     repeating-linear-gradient(
       45deg,
       transparent,
@@ -152,18 +175,32 @@ body::before {
 
 /* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 61, 31, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(255, 61, 31, 0.6); }
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 61, 31, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 61, 31, 0.6);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 .animate-float {

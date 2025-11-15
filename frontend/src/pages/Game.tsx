@@ -137,7 +137,7 @@ const Game: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
+    <div className="game-root min-h-screen w-screen bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-auto md:overflow-hidden">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -250,10 +250,9 @@ const Game: React.FC = () => {
                 }
               `}
             >
-                
               {/* Stacked Effect  */}
-               <div className="absolute top-1 left-1 w-full h-full bg-gradient-to-br from-ember-600/30 to-ember-800/30 rounded-xl blur-sm" />  
-               <div className="absolute top-0.5 left-0.5 w-full h-full bg-gradient-to-br from-ember-600/50 to-ember-800/50 rounded-xl" />
+              <div className="absolute top-1 left-1 w-full h-full bg-gradient-to-br from-ember-600/30 to-ember-800/30 rounded-xl blur-sm" />
+              <div className="absolute top-0.5 left-0.5 w-full h-full bg-gradient-to-br from-ember-600/50 to-ember-800/50 rounded-xl" />
 
               {/* Main Deck */}
               <div className="relative w-20 h-28 sm:w-24 sm:h-32 md:w-28 md:h-40 bg-gradient-to-br from-ember-600 via-ember-700 to-ember-900 rounded-xl shadow-2xl flex flex-col items-center justify-center border-2 border-ember-500/50">
