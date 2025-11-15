@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
 
+
 @theme {
   /* Font Families */
   --font-family-display: "Baloo 2", cursive;
   --font-family-body: "Inter", sans-serif;
+  --font-family-ui: "Titan-one";
 
   /* Premium Dark Gaming Palette */
   --color-void-950: #0a0a0f;
@@ -59,26 +61,28 @@ body {
 
 /* Landscape Mode Enforcement for Mobile */
 @media screen and (max-width: 768px) and (orientation: portrait) {
-  body::before {
-    content: "📱 Please rotate your device";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #0a0a0f, #13131a);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-family-display);
-    font-size: 1.5rem;
-    text-align: center;
-    padding: 2rem;
-    z-index: 99999;
-    gap: 1rem;
-  }
+body::before {
+  content: "📱 Please rotate your device";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0a0a0f, #13131a);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* allow content to start from top */
+  font-family: var(--font-family-display);
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 2rem;
+  z-index: 99999;
+  gap: 1rem;
+  overflow-y: auto; /* allow vertical scrolling */
+}
+
 
   body::after {
     content: "This game is best played in landscape mode";

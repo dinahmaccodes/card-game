@@ -53,4 +53,4 @@ export interface GameRules {
       description: string;
     };
   };
-}
+} 
