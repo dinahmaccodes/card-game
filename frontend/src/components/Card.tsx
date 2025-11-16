@@ -90,7 +90,7 @@ const CardComponent: React.FC<CardProps> = ({
                 x2="0%"
                 y2="100%"
               >
-                <stop offset="0%" stopColor="white" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="white" stopOpacity="0.4" />
                 <stop offset="100%" stopColor="white" stopOpacity="0" />
               </linearGradient>
             </defs>
