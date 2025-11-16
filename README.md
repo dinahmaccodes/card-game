@@ -9,27 +9,9 @@
 
 ---
 
-## **Try It Now** (10 minutes)
-
-**Want to test the production-ready backend on your machine?**
-
-**[Quick Test Guide](./TEST_THIS_NOW.md)** - One-page checklist  
- **[Detailed Testing](./docs/QUICK_TEST.md)** - Step-by-step walkthrough
-
-**What you'll test:**
-
-- Deploy smart contract to local Linera network
-- Query game state via GraphQL (< 50ms response)
-- Verify all 12 API endpoints working
-- See microchain architecture in action
-
-**Live Demo:** <https://linot.vercel.app> _(frontend only - backend integration coming in Wave 3)_
-
----
-
 ## Overview
 
-**Linot** is a multiplayer Whot-style card game built on Linera's microchain architecture.  
+**Linot** is a multiplayer Whot-style card game built on Linera’s microchain architecture.  
 It reimagines the classic local card game we grew up playing as kids — but this time, every move happens instantly.
 
 Players can challenge friends, join tournaments, or spectate live matches.  
@@ -77,56 +59,32 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 - Penalty stacking for Pick Two/Pick Three cards
 - Last card challenge system with automatic enforcement
 - Player forfeit handling with winner determination
-- Follows Linera SDK best practices and official documentation patterns
+
+#### Code Quality
+
+- 0 compilation errors
+- 0 warnings
+- Follows Linera SDK best practices
+- Matches patterns from reference projects (Microbet, ChainClashArena)
 
 #### What's Ready
 
-- **Backend contract** - Fully deployable to local Linera network
-- **GraphQL query layer** - 12+ endpoints serving real-time game state
-- **Complete game logic** - All Whot rules, special cards, and win conditions implemented
-- **State management** - Linera Views with proper initialization and defaults
-- **Local deployment tested** - Working on local Linera network with < 50ms query latency
-
-#### Current Status
-
-**Backend:** Production-ready and fully tested on local Linera network  
-**Frontend:** Functional demo available at [linot.vercel.app](https://linot.vercel.app) - **not yet connected to backend**  
-**Deployment:** Currently working with local Linera network deployment  
-**Testing:** Backend can be tested via GraphQL queries (see [TESTING_BACKEND.md](docs/TESTING_BACKEND.md))
+- Backend contract deployable to Linera testnet
+- GraphQL service ready for frontend integration
+- Full game playable end-to-end on-chain
 
 #### Still in Progress - To Be worked on for Wave 3
 
-- **GraphQL mutations** - Expose operations (JoinMatch, StartMatch, PlayCard) via mutations
-- **Frontend-backend integration** - Connect React UI to smart contract
-- **Live gameplay demo** - Full 2-player match with real-time updates
-- **Spectator betting UI** - (smart contract hooks prepared)
-- **Comprehensive test suite**
+- Frontend integration with GraphQL queries
+- Spectator betting UI (smart contract hooks prepared)
+- Comprehensive test suite
+- Computer opponent (deferred to post-Wave 3)
 
-**Next up (Wave 3):** GraphQL mutation layer, frontend-backend integration, betting mechanics start, and comprehensive testing.
-
----
-
-## Quick Testing (10 minutes)
-
-**Want to test the backend right now?** Follow this guide:
-
-**[Quick Testing Guide](./docs/QUICK_TEST.md)** - Step-by-step instructions to:
-
-1. Build the WASM binaries (2 min)
-2. Start local Linera network (30 sec)
-3. Deploy the application (1 min)
-4. Test via terminal or browser (5 min)
-
-**What you'll verify:**
-
-- Backend deploys and runs on your machine
-- GraphQL queries respond in < 50ms
-- Complete game state accessible via API
-- All 12 query endpoints working
+**Next up (Wave 3):** Frontend-backend integration, betting mechanics finalization, comprehensive testing, and state persistence hardening.
 
 ---
 
-## Core Concept and Aim for Linot as a Game
+## Core Concept
 
 | Feature                        | Description                                                                                         |
 | ------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -134,7 +92,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 | **Microchain per Match**       | Each match runs on its own microchain — zero lag, no interference                                   |
 | **Prediction Market Layer**    | Spectators place live bets; odds adjust dynamically via an on-chain pool                            |
 | **Manual Reward Distribution** | Winners and top players are recorded on-chain, with rewards manually handled during the early phase |
-| **Web2 Feel, Web3 Power**      | Interactive and Creative UI + GraphQL subscriptions + Linera’s instant state updates                                              |
+| **Web2 Feel, Web3 Power**      | GraphQL subscriptions + Linera’s instant state updates                                              |
 
 ---
 
@@ -159,14 +117,16 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ## Technical Architecture
 
-| Layer                  | Stack                                         |
-| ---------------------- | --------------------------------------------- |
-| **Frontend**           | React + Vue + TypeScript + TailwindCSS        |
-| **Blockchain Backend** | Rust - Leveraging Linera Microchains (one microchain per match) |
-| **Real-Time Updates**  | GraphQL Subscriptions                         |
-| **Smart Contracts**    | Rust (Linera SDK)                             |
+| Layer                  | Stack                                                                 |
+| ---------------------- | --------------------------------------------------------------------- |
+| **Frontend**           | React + Vue + TypeScript + TailwindCSS                                |
+| **State Management**   | Zustand (client) + Linera for on-chain state                          |
+| **Blockchain Backend** | Linera Microchains (one microchain per match)                         |
+| **Real-Time Updates**  | GraphQL Subscriptions                                                 |
+| **Smart Contracts**    | Rust (Linera SDK)                                                     |
+| **Betting Engine**     | On-chain market maker for live odds                                   |
+| **Storage**            | Linera key-value store for game data, leaderboards, and match history |
 
-<!-- | **State Management**   | Zustand (client) + Linera for on-chain state  | -->
 ---
 
 ## Development Plan
@@ -177,7 +137,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 - Backend structure drafted with comments
 - README and documentation baseline established
 
-**Outcome:** Architectural foundation=complete.
+**Outcome:** Architectural foundation and scaffolding complete.
 
 ---
 
@@ -246,102 +206,9 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 | Name                | Role                                  | Bio                                                                                                                   |
 | ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Dinah Macaulay**  | Smart Contract Engineer               | Software developer passionate about blockchain UX and infrastructure. Experienced in Solidity, Cairo, & Rust, working with Linera SDK. |
+| **Dinah Macaulay**  | Smart Contract Engineer               | Software developer passionate about blockchain UX and infrastructure. Experienced in Solidity, Cairo, and Linera SDK. |
 | **Osehotue Divine** | Frontend Developer / Technical Writer | Builds fast, accessible interfaces with React and TypeScript.                                                         |
-| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences. Designs Pitch Deck details for Linot                                                               |
-
----
-
-## Documentation
-
-**[Complete Documentation Index](docs/DOCUMENTATION_INDEX.md)** - All guides organized by use case
-
-### Quick Start
-
-- **[Quick Testing Guide](docs/QUICK_TEST.md)** - **START HERE!** Test the backend in 10 minutes (step-by-step)
-- **[One-Page Checklist](TEST_THIS_NOW.md)** - Fastest way to test (copy-paste commands)
-
-### For Developers
-
-- **[Testing the Backend](docs/TESTING_BACKEND.md)** - Complete guide to deploy and test the backend locally
-- **[GraphQL API Guide](docs/GRAPHQL_GUIDE.md)** - Complete reference for querying game state via GraphQL
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-- **[Local Deployment Guide](docs/deployment_local_guide.md)** - Step-by-step setup for running Linot locally
-
-### Quick Start (Local Testing)
-
-**You'll need 3 terminals for this setup:**
-
-```bash
-# TERMINAL 1: Start local Linera network (keep this running)
-cd linot-card-game
-linera net up
-
-# Copy the export commands shown in the output - you'll need them for Terminal 2
-# Example:
-#   export LINERA_WALLET="/tmp/.tmpXXXXX/wallet_0.json"
-#   export LINERA_KEYSTORE="/tmp/.tmpXXXXX/keystore_0.json"
-#   export LINERA_STORAGE="rocksdb:/tmp/.tmpXXXXX/client_0.db"
-# Keep this terminal running!
-```
-
-```bash
-# TERMINAL 2: Deploy and start service (open a NEW terminal)
-
-# Step 1: Paste the export commands from Terminal 1 (with YOUR own actual paths - do not copy this please)
-export LINERA_WALLET="/tmp/.tmpXXXXX/wallet_0.json"
-export LINERA_KEYSTORE="/tmp/.tmpXXXXX/keystore_0.json"
-export LINERA_STORAGE="rocksdb:/tmp/.tmpXXXXX/client_0.db"
-
-# Step 2: Build the backend
-cd linot-card-game/backend
-cargo build --target wasm32-unknown-unknown --release
-cd ..
-
-# Step 3: Deploy the application
-# App ID will be retured as part of the output at the top - Take note of it
-linera publish-and-create \
-  backend/target/wasm32-unknown-unknown/release/backend_contract.wasm \
-  backend/target/wasm32-unknown-unknown/release/backend_service.wasm \
-  --json-argument '{"max_players": 2, "is_ranked": false, "strict_mode": false}'
-
-# Step 4: Get your Chain ID and add it to where you stored your App ID (save these)
-linera wallet show
-
-# Step 5: Start GraphQL service (keep this running)
-linera service --port 8080
-```
-
-```bash
-# TERMINAL 3: Test the backend (open a NEW terminal)
-
-# Replace with YOUR actual Chain ID and App ID from Terminal 2
-CHAIN_ID="your_chain_id_here"
-APP_ID="your_app_id_here"
-
-curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "query { status deckSize players { nickname } }"}'
-```
-
-**Expected response:** `{"data":{"status":"WAITING","deckSize":0,"players":[]}}`
-
-See **[TESTING_BACKEND.md](docs/TESTING_BACKEND.md)** for complete testing instructions with all available queries.
-
----
-
-## Frontend Demo
-
-A functional frontend demo is available at [linot.vercel.app](https://linot.vercel.app), showcasing the intended user experience.
-
-**Note:** The demo is currently **not connected to the backend**.
-This is meant to demonstrate the UI/UX design and game flow. Backend integration (connecting React to GraphQL API) is in progress for Wave 3.
-
-## More on Design
-
-Here is a sample of what our Pitch Deck is for V2 and a sneak-peek of our UI as we build
-
-<https://www.figma.com/proto/4dgqc4TA9XoNoUNmy1xerT/Hackathon-Projects?page-id=1082%3A2&node-id=1500-3855&viewport=-914%2C-819%2C0.14&t=elRcK2nTS8Jmronp-1&scaling=scale-down-width&content-scaling=fixed>
+| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences.                                                                |
 
 ---
 
@@ -349,7 +216,7 @@ Here is a sample of what our Pitch Deck is for V2 and a sneak-peek of our UI as 
 
 - **GitHub:** [https://github.com/dinahmaccodes/card-game](https://github.com/dinahmaccodes/card-game)
 - **Demo:** [https://linot.vercel.app](https://linot.vercel.app)
-- **Linera Docs:** [https://linera.dev](https://linera.dev)
+- **Documentation:** `/docs` folder inside the repo
 
 ---
 
