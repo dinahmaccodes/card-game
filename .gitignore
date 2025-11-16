@@ -3,16 +3,19 @@
 /target/
 # Ignore backend target specifically
 /backend/target/
+# Ignore doc files for personal build purposes
 /docs/code.md
 /docs/WAVE2_IMPROVEMENTS.
 /docs/IMPLEMENTATION_SUMMARY.md
 /docs/CONTRACT_BUILD_GUIDE.md
-
+/docs/demo_present_sample.md
 DEPLOYMENT_GUIDE.md
 GRAPHQL_API.md
 WAVE2_CHECKLIST.md
 WAVE2_SUMMARY.md
 WAVE2_IMPROVEMENTS.md
+
+/linera-protocol/
 # dependency directories
 /frontend/node_modules/
 

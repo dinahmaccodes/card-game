@@ -114,7 +114,8 @@ pub enum CardValue {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MatchConfig {
     pub max_players: u8,
-    pub host: AccountOwner,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub host: Option<AccountOwner>,
     pub is_ranked: bool,
     pub strict_mode: bool, // Enforce "must draw if no valid move"
 }

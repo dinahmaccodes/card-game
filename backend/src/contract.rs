@@ -35,7 +35,12 @@ impl Contract for LinotContract {
         LinotContract { state, runtime }
     }
 
-    async fn instantiate(&mut self, config: Self::InstantiationArgument) {
+    async fn instantiate(&mut self, mut config: Self::InstantiationArgument) {
+        // Auto-detect host from authenticated signer if not provided
+        if config.host.is_none() {
+            config.host = self.runtime.authenticated_signer();
+        }
+        
         // Store match configuration
         self.state.config.set(config);
 
@@ -166,7 +171,11 @@ impl LinotContract {
         let mut match_data = self.state.match_data.get().clone();
 
         // Validate: only host can start
-        if caller != config.host {
+        if let Some(host) = &config.host {
+            if caller != *host {
+                return Err(LinotError::OnlyHostCanStart);
+            }
+        } else {
             return Err(LinotError::OnlyHostCanStart);
         }
 

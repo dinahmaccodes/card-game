@@ -34,7 +34,7 @@ That means **sub-second latency**, no congestion, and gameplay that feels like W
 
 Wave 2 successfully transformed Linot from a prototype into a functional multiplayer game with a production-ready backend architecture.
 
-#### Major Achievements:
+#### Major Achievements
 
 **Game Logic & Multiplayer:**
 
@@ -60,25 +60,25 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 - Last card challenge system with automatic enforcement
 - Player forfeit handling with winner determination
 
-#### Code Quality:
+#### Code Quality
 
 - 0 compilation errors
 - 0 warnings
 - Follows Linera SDK best practices
 - Matches patterns from reference projects (Microbet, ChainClashArena)
 
-#### What's Ready:
+#### What's Ready
 
 - Backend contract deployable to Linera testnet
 - GraphQL service ready for frontend integration
 - Full game playable end-to-end on-chain
 
-#### Still in Progress - To Be worked on for Wave 3:
+#### Still in Progress - To Be worked on for Wave 3
 
--  Frontend integration with GraphQL queries
--  Spectator betting UI (smart contract hooks prepared)
--  Comprehensive test suite
--  Computer opponent (deferred to post-Wave 3)
+- Frontend integration with GraphQL queries
+- Spectator betting UI (smart contract hooks prepared)
+- Comprehensive test suite
+- Computer opponent (deferred to post-Wave 3)
 
 **Next up (Wave 3):** Frontend-backend integration, betting mechanics finalization, comprehensive testing, and state persistence hardening.
 
@@ -226,12 +226,6 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 - **Reward Dashboard** for automatically tracking winners globally
 - **Cross-Microchain Communication** experiments for match coordination
 - **Match Analytics** to visualize performance across sessions
-
----
-
-## 🧾 License
-
-This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
 
 ---
 
