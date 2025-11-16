@@ -134,7 +134,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 | **Microchain per Match**       | Each match runs on its own microchain — zero lag, no interference                                   |
 | **Prediction Market Layer**    | Spectators place live bets; odds adjust dynamically via an on-chain pool                            |
 | **Manual Reward Distribution** | Winners and top players are recorded on-chain, with rewards manually handled during the early phase |
-| **Web2 Feel, Web3 Power**      | GraphQL subscriptions + Linera’s instant state updates                                              |
+| **Web2 Feel, Web3 Power**      | Interactive and Creative UI + GraphQL subscriptions + Linera’s instant state updates                                              |
 
 ---
 
@@ -162,11 +162,11 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 | Layer                  | Stack                                         |
 | ---------------------- | --------------------------------------------- |
 | **Frontend**           | React + Vue + TypeScript + TailwindCSS        |
-| **State Management**   | Zustand (client) + Linera for on-chain state  |
-| **Blockchain Backend** | Linera Microchains (one microchain per match) |
+| **Blockchain Backend** | Rust - Leveraging Linera Microchains (one microchain per match) |
 | **Real-Time Updates**  | GraphQL Subscriptions                         |
 | **Smart Contracts**    | Rust (Linera SDK)                             |
 
+<!-- | **State Management**   | Zustand (client) + Linera for on-chain state  | -->
 ---
 
 ## Development Plan
@@ -246,9 +246,9 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 | Name                | Role                                  | Bio                                                                                                                   |
 | ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Dinah Macaulay**  | Smart Contract Engineer               | Software developer passionate about blockchain UX and infrastructure. Experienced in Solidity, Cairo, and Linera SDK. |
+| **Dinah Macaulay**  | Smart Contract Engineer               | Software developer passionate about blockchain UX and infrastructure. Experienced in Solidity, Cairo, & Rust, working with Linera SDK. |
 | **Osehotue Divine** | Frontend Developer / Technical Writer | Builds fast, accessible interfaces with React and TypeScript.                                                         |
-| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences.                                                                |
+| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences. Designs Pitch Deck details for Linot                                                               |
 
 ---
 
