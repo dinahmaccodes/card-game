@@ -11,12 +11,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartGame }) => {
     <div className="dashboard-root min-h-screen w-full bg-gradient-to-br from-void-950 via-void-900 to-void-800 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="text-center sm:pt-12 pb-6 px-4">
-        <div className="flex items-center justify-center mb-4">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-ember-500 to-ember-700 rounded-xl flex items-center justify-center shadow-2xl glow-ember">
-            <span className="text-white text-2xl sm:text-3xl font-bold">L</span>
+        <div className="flex items-center justify-center ">
+          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl flex items-center justify-center">
+            <span className="text-white text-xl font-bold">
+              <img
+                src="/full symbol.png"
+                alt="linot"
+                className="w-full h-full object-contain"
+              />
+            </span>
           </div>
         </div>
-        <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl text-white mb-2 mt-4">
+        <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl text-white mb-2">
           Linot!
         </h1>
         <p className="text-gray-400 text-base sm:text-lg">

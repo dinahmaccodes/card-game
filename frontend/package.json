@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/baloo-2": "^5.2.7",
     "@fontsource/nunito-sans": "^5.2.7",
+    "@fontsource/titan-one": "^5.2.8",
     "@tailwindcss/vite": "^4.1.16",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
