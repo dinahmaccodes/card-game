@@ -129,7 +129,7 @@ linera publish-and-create \
   --json-argument '{"max_players": 2, "is_ranked": false, "strict_mode": false}'
 ```
 
-**Expected output:**
+**Expected output:** -- Get Application ID from here
 
 ```
 Bytecode published successfully!
@@ -146,11 +146,11 @@ Application ID: 9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
 **Still in TERMINAL 2:**
 
 ```bash
-# Get your Chain ID and Application ID
+# Get your Chain ID 
 linera wallet show
 ```
 
-**Look for and copy:**
+**Look for the CHAIN_ID, Copy and keep where you stored APP_ID:**
 
 - **Chain ID** (long hex string under "Chain Information")
 - **Application ID** (under "Applications" section)
@@ -158,8 +158,8 @@ linera wallet show
 **Example:**
 
 ```
-Chain ID: d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de
-Application ID: 9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
+CHAIN_ID: d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de
+APP_ID: 9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
 ```
 
 **Now start the GraphQL service:**
@@ -183,9 +183,9 @@ GraphiQL IDE: http://localhost:8080
 **TERMINAL 3** - Open a third terminal:
 
 ```bash
-# Set your Chain ID and App ID (replace with YOUR values)
-CHAIN_ID="d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de"
-APP_ID="9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea"
+# Set your Chain ID and App ID (Please replace with your values)
+CHAIN_ID="eb4641a185be8977c034b69f4fb2e80cb91c81e5a6275e2a85f763777444719f"
+APP_ID="86e143565c7f3d62f5aa2986d6652cdebaed56559911cdd53836ef5c159f9903"
 
 # Test 1: Get match status
 curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
@@ -268,7 +268,7 @@ query {
 
 ---
 
-## More Queries to Try
+## Queries to Try
 
 ### Query 1: Complete Game State
 
@@ -288,6 +288,28 @@ query {
 }
 ```
 
+**Expected Response:**
+
+```json
+{
+  "data": {
+    "status": "WAITING",
+    "deckSize": 0,
+    "currentPlayerIndex": 0,
+    "topCard": null,
+    "players": []
+  }
+}
+```
+
+**Why null/0/[]?** These are CORRECT responses showing accurate empty state:
+
+- `null` = No card on discard pile yet (needs StartMatch mutation)
+- `0` = Deck not shuffled yet (needs StartMatch mutation)
+- `[]` = No players joined yet (needs JoinMatch mutation)
+
+Broken queries return `{"errors":[...]}`, not `{"data":{...}}`.
+
 ### Query 2: All Configuration
 
 ```graphql
@@ -299,6 +321,22 @@ query {
   }
   status
   deckSize
+}
+```
+
+**Expected Response:**
+
+```json
+{
+  "data": {
+    "config": {
+      "maxPlayers": 2,
+      "isRanked": false,
+      "strictMode": false
+    },
+    "status": "WAITING",
+    "deckSize": 0
+  }
 }
 ```
 
@@ -315,7 +353,18 @@ query {
 }
 ```
 
-**All should return valid JSON responses with game state!**
+**Expected Response:**
+
+```json
+{
+  "data": {
+    "status": "WAITING",
+    "players": []
+  }
+}
+```
+
+**Note:** Empty `players` array is correct - no one has joined yet!
 
 ---
 
@@ -323,28 +372,28 @@ query {
 
 **Backend Functionality:**
 
-- ✅ Smart contract deployment to Linera microchain
-- ✅ GraphQL service running and accessible
-- ✅ Real-time state queries (< 50ms response time)
-- ✅ Type-safe JSON responses
-- ✅ Match initialization with correct defaults
+- Smart contract deployment to Linera microchain
+- GraphQL service running and accessible
+- Real-time state queries (< 50ms response time)
+- Type-safe JSON responses
+- Match initialization with correct defaults
 
 **Technical Achievement:**
 
-- ✅ Linera SDK integration (v0.15.4)
-- ✅ async-graphql service layer (v7.0)
-- ✅ WASM compilation and deployment
-- ✅ State management with Linera Views
-- ✅ Microchain architecture (dedicated chain per match)
+- Linera SDK integration (v0.15.4)
+- async-graphql service layer (v7.0)
+- WASM compilation and deployment
+- State management with Linera Views
+- Microchain architecture (dedicated chain per match)
 
 **Game Logic Ready:**
 
-- ✅ Match configuration system
-- ✅ Player management hooks
-- ✅ Game state tracking
-- ✅ Complete Whot ruleset (6 special cards)
-- ✅ Turn-based enforcement
-- ✅ Win/draw detection
+- Match configuration system
+- Player management hooks
+- Game state tracking
+- Complete Whot ruleset (6 special cards)
+- Turn-based enforcement
+- Win/draw detection
 
 ---
 
@@ -417,8 +466,8 @@ pkill -f linera
 
 **Current Status:**
 
-- Backend: Production-ready ✅
-- GraphQL queries: Fully functional ✅
+- Backend: Production-ready
+- GraphQL queries: Fully functional
 - Frontend integration: In progress (Wave 3)
 
 **To explore more:**

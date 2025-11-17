@@ -106,7 +106,7 @@ READY!
 Press ^C to terminate the local test network and clean the temporary directory.
 ```
 
-**IMPORTANT:**
+**IMPORTANT TIP:**
 
 1. **Copy the three export commands** shown (with your actual tmp folder path, not XXXXXX)
 2. **Keep this terminal running** - don't close it!
@@ -159,14 +159,14 @@ In **TERMINAL 2**, run:
 linera wallet show
 ```
 
-**Look for:**
+**Go back to where you kept your details:**
 
 ```
 ╭─────────────────────────────────────────────────────────────╮
 │ Chain ID                                                    │
 │ d228a627388a5e78a6d3ec13732e32449817bcefdaf94a5240...     │ ← CHAIN_ID
 │                                                             │
-│ Applications                                                │
+│ Applications published and created in 2684 ms                                                │
 │ 9aebcaf6388679681080dd8fc710db4d43429a0040417fe852...     │ ← APP_ID
 ╰─────────────────────────────────────────────────────────────╯
 ```
@@ -196,12 +196,18 @@ GraphiQL IDE: http://localhost:8080
 
 **What's available:**
 
-- GraphQL API endpoint: `http://localhost:8080/chains/{CHAIN_ID}/applications/{APP_ID}`
+- GraphQL API endpoint: `http://localhost:8080/chains/CHAIN_ID/applications/APP_ID`
 - GraphiQL IDE (browser): `http://localhost:8080`
 
 ---
 
-## Testing the GraphQL API
+## Testing the GraphQL API In Terminal
+
+For more structured view, use graphql link in this format
+
+```
+http://localhost:8080/chains/d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de/applications/9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
+```
 
 ### Terminal 3: Run GraphQL Queries
 
@@ -341,7 +347,7 @@ curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
 
 ## What This Demonstrates
 
-### 1. Complete Backend Functionality ✅
+### 1. Complete Backend Functionality
 
 **GraphQL Service Layer:**
 
@@ -361,7 +367,7 @@ curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
 - State persistence operational
 - Default match configuration applied
 
-### 2. Production-Ready Architecture ✅
+### 2. Production-Ready Architecture
 
 **Code Quality:**
 
@@ -376,7 +382,7 @@ curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
 - GraphQL service running
 - State queries returning valid data
 
-### 3. Game Logic Implementation ✅
+### 3. Game Logic Implementation
 
 **Complete Whot Ruleset:**
 
@@ -479,7 +485,7 @@ Compare to traditional blockchains:
 - Ethereum: 12-15 seconds per transaction
 - Polygon: 2-3 seconds per transaction
 - Solana: 400-800ms
-- **Linera: < 50ms** ⚡
+- **Linera: < 50ms**
 
 ---
 
@@ -516,11 +522,11 @@ curl -X POST "..." -d '{"query": "query { players { nickname cardCount } }"}'
 
 **What's Working:**
 
-- ✅ Backend contract deployment
-- ✅ GraphQL service layer
-- ✅ State queries (12+ endpoints)
-- ✅ Match initialization
-- ✅ Local network operation
+- Backend contract deployment
+- GraphQL service layer
+- State queries (12+ endpoints)
+- Match initialization
+- Local network operation
 
 **What's Next:**
 

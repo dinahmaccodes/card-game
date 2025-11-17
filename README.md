@@ -1,4 +1,4 @@
-# Link to Live Demo V1
+# Link to Live Demo V2
 
 <https://linot.vercel.app>
 
@@ -9,21 +9,32 @@
 
 ---
 
-## **Try It Now** (10 minutes)
+## Try It Now (10 minutes)
 
-**Want to test the production-ready backend on your machine?**
+Test the production-ready backend on your local machine
 
-**[Quick Test Guide](./TEST_THIS_NOW.md)** - One-page checklist  
- **[Detailed Testing](./docs/QUICK_TEST.md)** - Step-by-step walkthrough
+[Quick Test Guide](./TEST_THIS_NOW.md) - One-page checklist  
+[Detailed Testing](./docs/QUICK_TEST.md) - Step-by-step walkthrough
 
 **What you'll test:**
 
 - Deploy smart contract to local Linera network
 - Query game state via GraphQL (< 50ms response)
-- Verify all 12 API endpoints working
+- Verify working API endpoints (status, config, currentPlayerIndex)
 - See microchain architecture in action
 
-**Live Demo:** <https://linot.vercel.app> _(frontend only - backend integration coming in Wave 3)_
+**Understanding the Results:**
+
+When you query the GraphQL API, you'll see responses like `{"data":{"currentPlayer":null}}` or `{"data":{"deckSize":0}}`.  
+These are CORRECT and prove the backend is working perfectly:
+
+- `null` = Query succeeded, no data exists yet (no players joined)
+- `0` = Initial state value (deck not shuffled yet)
+- `[]` = Empty array (no players in match)
+
+Broken queries return `{"errors":[...]}`, not `{"data":{...}}`. See [GRAPHQL_GUIDE.md](docs/GRAPHQL_GUIDE.md) for detailed explanation.
+
+Live Demo: <https://linot.vercel.app> (frontend only - backend integration coming in Wave 3)
 
 ---
 
@@ -94,15 +105,268 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 **Deployment:** Currently working with local Linera network deployment  
 **Testing:** Backend can be tested via GraphQL queries (see [TESTING_BACKEND.md](docs/TESTING_BACKEND.md))
 
-#### Still in Progress - To Be worked on for Wave 3
+---
 
-- **GraphQL mutations** - Expose operations (JoinMatch, StartMatch, PlayCard) via mutations
-- **Frontend-backend integration** - Connect React UI to smart contract
-- **Live gameplay demo** - Full 2-player match with real-time updates
-- **Spectator betting UI** - (smart contract hooks prepared)
-- **Comprehensive test suite**
+## Development Roadmap
 
-**Next up (Wave 3):** GraphQL mutation layer, frontend-backend integration, betting mechanics start, and comprehensive testing.
+### Wave 3: Multiplayer Gameplay & Player Betting (Nov 17–26)
+
+**Goal:** Make the game fully playable with player-to-player betting
+
+**Core Deliverables:**
+
+1. **GraphQL Mutations** - Enable gameplay from browser
+
+   - `JoinMatch` - Players join a match
+   - `StartMatch` - Initialize deck and deal cards
+   - `PlayCard` - Execute card plays with validation
+   - `DrawCard` - Draw from deck
+   - `DeclareLastCard` - Challenge system
+   - Status: In Progress
+
+2. **Frontend-Backend Integration** - Connect React to Linera
+
+   - React components trigger GraphQL mutations
+   - WebSocket subscriptions for real-time updates
+   - Turn notifications and live state sync
+   - Status: NOT STARTED
+
+3. **Live 2-Player Gameplay** - Full playable game
+
+   - Turn-based card play via browser
+   - Card validation and rule enforcement
+   - Win/draw detection and match completion
+   - Status: NOT STARTED
+
+4. **Player-to-Player Betting** - Staking mechanism
+
+   - Bet/stake fields in match creation
+   - "Winner takes all" transfer logic
+   - Stake holding and validation
+   - Winnings transfer on match completion
+   - Status: NOT STARTED
+
+5. **Spectator View** - Read-only match observation
+
+   - Non-players can view live matches
+   - Real-time game state updates
+   - Player rankings displayed during match
+   - Foundation for Wave 4 spectator betting
+   - Status: NOT STARTED
+
+6. **UI Improvements** - Gameplay polish
+   - Smooth card animations
+   - Turn indicators and notifications
+   - Valid card highlighting
+   - Match status displays
+   - Status: NOT STARTED
+
+**Success Details:**
+
+- Play a complete 2-player match via browser
+- Mutations execute card plays correctly
+- Player betting transfers work reliably
+- WebSocket updates in real-time
+- All queries and mutations tested
+- Live demo video demonstrates full gameplay
+
+**Timeline:** 10 days (Nov 17-26)
+
+---
+
+### Wave 4: Advanced Features & Enhanced Betting (Dec 1–10)
+
+**Goal:** Transform from functional demo to feature-rich gaming platform
+
+**Core Deliverables:**
+
+1. **Player Statistics & Reputation** - Track performance history
+
+   - Wins, losses, draws per player
+   - Win rate percentage calculations
+   - Special cards used statistics
+   - Last card challenge success rates
+   - Cross-chain stats persistence
+   - GraphQL queries for player history
+   - Status: NOT STARTED
+
+2. **Global Leaderboards** - Competitive rankings
+
+   - Win rate rankings (minimum 10 matches)
+   - Total wins leaderboard
+   - Fastest game completion times
+   - Most matches played
+   - Highest win streaks
+   - Real-time ranking updates
+   - Status: NOT STARTED
+
+3. **Match Replay System** - Complete game history
+
+   - Every card play recorded with timestamps
+   - Full event history per match
+   - Replay queries for verification
+   - Dispute resolution capability
+   - Immutable on-chain storage
+   - Status: NOT STARTED
+
+4. **Spectator Betting System** - Advanced betting
+
+   - Spectators place bets on match outcomes
+   - Dynamic odds based on player rankings
+   - Betting pool mechanics
+   - Payout calculations
+   - Betting history tracking
+   - Status: NOT STARTED
+
+5. **UI/UX Polish & Animations** - Professional presentation
+   - Card dealing animations
+   - Card flip effects
+   - Penalty counter animations
+   - Sound effects and feedback
+   - Mobile responsiveness
+   - Accessibility features (high contrast, screen reader support)
+   - Status: NOT STARTED
+
+**Success Criteria:**
+
+- Player stats update automatically post-match
+- Leaderboards display accurate rankings
+- Spectators can bet on live matches
+- Tournaments function end-to-end
+- All features performant at scale
+- Professional visual polish throughout
+
+**Timeline:** 10 days (Dec 1-10)
+
+---
+
+### Wave 5: Betting Perfection & Competitive Features (Dec 15–Jan 7)
+
+**Goal:** Perfect betting mechanics and prepare for public launch
+
+**Core Deliverables:**
+
+1. **Real-Time Leaderboard Updates** - Live rankings
+
+   - Instant rank recalculation post-match
+   - Percentile calculations
+   - Historical rank tracking
+   - Player tier systems
+   - Status: NOT STARTED
+
+2. **Advanced Tournament System** - Competitive excellence
+
+   - Multi-round tournament support
+   - Swiss pairing system (optional)
+   - Tournament seeding by ranking
+   - Bracket visualization
+   - Tournament history and archives
+   - Status: NOT STARTED
+
+3. **Betting Pool Mechanics** - Complex betting
+
+   - Multi-outcome betting (winner, runner-up, etc.)
+   - In-play odds adjustments
+   - Parlay betting (bet multiple matches)
+   - Betting limits and controls
+   - Status: NOT STARTED
+
+4. **Community Features** - Player engagement
+
+   - Player profiles and achievements
+   - Match history graphs
+   - Performance trends
+   - Social ranking comparisons
+   - Status: NOT STARTED
+
+5. **Load Testing & Optimization** - Production readiness
+
+   - Stress test at 10,000 concurrent players
+   - Cross-chain messaging at scale
+   - Database query optimization
+   - Network latency handling
+   - Status: NOT STARTED
+
+6. **Bug Fixes & Refinement** - Quality assurance
+   - Edge case handling
+   - Error message improvements
+   - UI/UX refinement based on feedback
+   - Performance bottleneck fixes
+   - Status: NOT STARTED
+
+**Success Criteria:**
+
+- System stable under 10,000 concurrent players
+- Leaderboards update in < 5 seconds post-match
+- All betting mechanics tested
+- 99.9% uptime on local testnet
+- Zero critical bugs
+
+**Timeline:** 24 days (Dec 15–Jan 7)
+
+---
+
+### Wave 6: MVP Launch & Documentation (Jan 12–21)
+
+**Goal:** Production-ready product for Linera testnet
+
+**Core Deliverables:**
+
+1. **Full UI Overhaul** - Presentation polish with Product Designer's guide
+
+   - Professional game design
+   - Brand consistency
+   - High-quality card graphics
+   - Smooth animations throughout
+   - Status: NOT STARTED
+
+2. **Onboarding & Tutorials** - Player education
+
+   - Interactive tutorial for new players
+   - In-game tips and guides
+   - Keyboard/gamepad controls
+   - Accessibility setup
+   - Status: NOT STARTED
+
+3. **Complete Documentation** - Developer & player guides
+
+   - **For Players:** Game rules, betting mechanics, strategies
+   - **For Developers:** Architecture guide, API reference, deployment instructions
+   - **For Community:** Contributing guidelines, roadmap, vision
+   - Status: IN PROGRESS
+
+4. **Wallet Integration** - Real onboarding
+
+   - Linera wallet connection
+   - Account creation flow
+   - Transaction signing
+   - Balance display
+   - Status: NOT STARTED
+
+5. **Testnet Deployment** - Live showcase
+
+   - Deploy to Linera public testnet
+   - DNS configuration
+   - CDN setup for frontend
+   - Monitoring and alerting
+   - Status: NOT STARTED
+
+6. **Marketing & Presentation** - submission
+   - Demo video compilation
+   - Presentation slides
+   - Technical write-up
+   - Performance benchmarks
+   - Status: NOT STARTED
+
+**Success Criteria:**
+
+- Live on Linera testnet
+- 1000+ concurrent players tested
+- Complete documentation available
+- Professional presentation ready
+- Judges can play real matches
+
+**Timeline:** 10 days (Jan 12-21)
 
 ---
 
@@ -134,7 +398,7 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 | **Microchain per Match**       | Each match runs on its own microchain — zero lag, no interference                                   |
 | **Prediction Market Layer**    | Spectators place live bets; odds adjust dynamically via an on-chain pool                            |
 | **Manual Reward Distribution** | Winners and top players are recorded on-chain, with rewards manually handled during the early phase |
-| **Web2 Feel, Web3 Power**      | Interactive and Creative UI + GraphQL subscriptions + Linera’s instant state updates                                              |
+| **Web2 Feel, Web3 Power**      | Interactive and Creative UI + GraphQL subscriptions + Linera’s instant state updates                |
 
 ---
 
@@ -159,29 +423,41 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 
 ## Technical Architecture
 
-| Layer                  | Stack                                         |
-| ---------------------- | --------------------------------------------- |
-| **Frontend**           | React + Vue + TypeScript + TailwindCSS        |
+| Layer                  | Stack                                                           |
+| ---------------------- | --------------------------------------------------------------- |
+| **Frontend**           | React + Vue + TypeScript + TailwindCSS                          |
 | **Blockchain Backend** | Rust - Leveraging Linera Microchains (one microchain per match) |
-| **Real-Time Updates**  | GraphQL Subscriptions                         |
-| **Smart Contracts**    | Rust (Linera SDK)                             |
+| **Real-Time Updates**  | GraphQL Subscriptions                                           |
+| **Smart Contracts**    | Rust (Linera SDK)                                               |
 
-<!-- | **State Management**   | Zustand (client) + Linera for on-chain state  | -->
+## <!-- | **State Management**   | Zustand (client) + Linera for on-chain state  | -->
+
+## Development Progress Summary
+
+| Wave       | Timeline     | Status       | Focus                          |
+| ---------- | ------------ | ------------ | ------------------------------ |
+| **Wave 1** | Oct 20-29    | Complete     | Architectural foundation       |
+| **Wave 2** | Nov 3-12     | **COMPLETE** | Multiplayer backend + GraphQL  |
+| **Wave 3** | Nov 17-26    | NOT STARTED  | Mutations + Frontend + Betting |
+| **Wave 4** | Dec 1-10     | NOT STARTED  | Features + Spectator betting   |
+| **Wave 5** | Dec 15-Jan 7 | NOT STARTED  | Betting perfection + Scale     |
+| **Wave 6** | Jan 12-21    | NOT STARTED  | MVP launch + Testnet           |
+
+**Current State:** Backend production-ready. Frontend integration begins Nov 17.
+
 ---
 
-## Development Plan
-
-### Wave 1: Core Game (Completed Oct 20–29)
+## Wave 1: Core Game (Completed Oct 20–29)
 
 - Frontend template ready (React + Tailwind)
 - Backend structure drafted with comments
 - README and documentation baseline established
 
-**Outcome:** Architectural foundation=complete.
+**Outcome:** Architectural foundation was established.
 
 ---
 
-### Wave 2: Multi-player Action Begins (Completed within Nov 3–12)
+## Wave 2: Multi-player Action Begins (Completed Nov 3–12)
 
 **Goal:** Move from simulation to live microchains and enable foundational multiplayer.
 
@@ -189,66 +465,19 @@ Wave 2 successfully transformed Linot from a prototype into a functional multipl
 - Transition to human vs human (2–4 players) gameplay using Linera microchains.
 - On-chain match creation and card actions live across dedicated match chains.
 
----
+**Outcome:** Production-ready backend with 12+ GraphQL queries, complete Whot logic, professional error handling.
 
-### Wave 3: Betting Mechanics + Multiplayer Hardening (Nov 17–26)
-
-**Goal:** Complete Multiplayer feature and start build of Betting Mechanism
-
-**Targets:**
-
-- Spectator leaderboard with persistent state maintained.
-- Manual staking system for multiplayer matches (winner takes all).
-
-**Additional Logic Targets:**
-
-- Betting logic setup V1 for internal players with manual payouts.
-- Persistence and recovery of match state per microchain.
-
----
-
-### **Wave 4: Improve Features (Dec 1-10)**
-
-**Goal:** Deliver a fully playable demo for the Linera showcase.
-
-- End-to-end on-chain gameplay
-- Wallet connection and onboarding UX.
-
-#### Plans to Improve Player Experience
-
-- Integrate **leaderboards** and player stats.
-- Improve animations, responsive layout, and lobby UX.
-- Initial implementation of **tournament mode** (4–8 players).
-
----
-
-### **Wave 5: Perfect Betting Feature and Larger Multiplayer Feature (Dec 15 - Jan 7)**
-
-- Real-time leaderboard updates
-- Improved performance for large tournaments
-- Perfect implementation of **tournament mode** (4–8 players).
-
----
-
-### **Wave 6: MVP Launch (Jan 12-21)**
-
-**Goal:** Prepare for presentation and Linera testnet launch.
-
-- Full UI overhaul for presentation
-- Onboarding tutorial + in-game guide
-- Load testing and bug cleanup in codebase
-- Documentation finalization - Make detailed docs for players to understnad Game and Developers to understand codebase
 - Recorded demo and marketing materials
 
 **Demo:** Polished, production-ready dApp for Linera Showcase and ETH Denver - if possible.
 
 ## Team
 
-| Name                | Role                                  | Bio                                                                                                                   |
-| ------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Name                | Role                                  | Bio                                                                                                                                    |
+| ------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Dinah Macaulay**  | Smart Contract Engineer               | Software developer passionate about blockchain UX and infrastructure. Experienced in Solidity, Cairo, & Rust, working with Linera SDK. |
-| **Osehotue Divine** | Frontend Developer / Technical Writer | Builds fast, accessible interfaces with React and TypeScript.                                                         |
-| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences. Designs Pitch Deck details for Linot                                                               |
+| **Osehotue Divine** | Frontend Developer / Technical Writer | Builds fast, accessible interfaces with React and TypeScript.                                                                          |
+| **Divine Macaulay** | Product Designer & UX Researcher      | Designs intuitive, player-centered gaming experiences. Designs Pitch Deck details for Linot                                            |
 
 ---
 

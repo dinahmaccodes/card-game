@@ -1,8 +1,8 @@
-Here's a comprehensive breakdown of the rules, game logic, and structure of the Nigerian Whot card game — perfect for building your online version.
+
 
 ---
 
-## 🃏 Nigerian Whot Card Game: Full Rules & Game Logic
+## 🃏 Whot Card Game: Full Rules & Game Logic
 
 ### Objective
 
@@ -23,7 +23,7 @@ Here's a comprehensive breakdown of the rules, game logic, and structure of the 
 
 ---
 
-### 🔄 Game Setup
+###  Game Setup
 
 - **Players**: 2–6
 - **Each player is dealt 6 cards**.
@@ -39,7 +39,7 @@ Here's a comprehensive breakdown of the rules, game logic, and structure of the 
 - On your turn, play a card that matches either the **shape** or **number** of the top discard.
 - If you can't play, **draw one card** from the draw pile.
 
-#### 🃏 Whot Card (Wild Card)
+####  Whot Card (Wild Card)
 
 - Can be played on any card.
 - When played, the player **declares a new shape**.
@@ -47,7 +47,7 @@ Here's a comprehensive breakdown of the rules, game logic, and structure of the 
 
 ---
 
-### 💥 Special Cards & Their Effects
+###  Special Cards & Their Effects
 
 | Card     | Effect         | Description                                 |
 | -------- | -------------- | ------------------------------------------- |

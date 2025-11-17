@@ -442,23 +442,27 @@ linera publish-and-create \
   --json-argument '{"max_players": 2, "host": "<account>", "is_ranked": false, "strict_mode": false}'
 ```
 
-### **Execute Operations (via CLI):**
+### **Execute Operations (Wave 3 - via GraphQL):**
+
+Operations will be exposed as GraphQL mutations in Wave 3. For now, they're only accessible through the contract layer.
+
+**Planned mutation format:**
 
 ```bash
-# Join match
-linera execute-operation \
-  --application-id <app-id> \
-  --operation '{"JoinMatch": {"nickname": "Alice"}}'
+# Join match (Wave 3)
+curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { joinMatch(nickname: \"Alice\") { success } }"}'
 
-# Start match (host only)
-linera execute-operation \
-  --application-id <app-id> \
-  --operation '{"StartMatch": {}}'
+# Start match (Wave 3)
+curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { startMatch { success } }"}'
 
-# Play a card
-linera execute-operation \
-  --application-id <app-id> \
-  --operation '{"PlayCard": {"card_index": 2, "chosen_suit": null}}'
+# Play a card (Wave 3)
+curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { playCard(cardIndex: 2) { success } }"}'
 ```
 
 ---
@@ -498,7 +502,6 @@ linera execute-operation \
 ```
 
 ---
-
 
 **"Not your turn"**
 
@@ -558,7 +561,7 @@ query {
 - Win/draw detection
 - Auto last-card calling
 - Deterministic shuffling
- 
+
 **Future Enhancements:**
 
 - **Wave 2**: 3-6 player support
@@ -569,7 +572,7 @@ query {
 
 ---
 
-##  Architecture Logic
+## Architecture Logic
 
 **Why Use Linera for a Card Game?**
 

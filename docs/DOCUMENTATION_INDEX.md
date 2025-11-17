@@ -4,11 +4,11 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 🚀 Start Here
+## Start Here
 
 ### For Quick Testing (10 minutes)
 
-**[TEST_THIS_NOW.md](../TEST_THIS_NOW.md)** ⭐ **START HERE**
+**[TEST_THIS_NOW.md](../TEST_THIS_NOW.md)** **START HERE**
 
 - One-page quick reference
 - Copy-paste checklist format
@@ -23,9 +23,19 @@ Complete guide to all testing documentation for the Linot card game backend.
 - Multiple testing options (terminal + browser)
 - Perfect for: First-time testers, learning the system
 
+### Understanding Query Responses
+
+**[docs/NULL_RESPONSE_EXPLANATION.md](./NULL_RESPONSE_EXPLANATION.md)** **READ IF CONFUSED ABOUT null**
+
+- Why null/0/[] responses are CORRECT
+- How to tell working vs broken queries
+- Technical explanation of Linera state initialization
+- Demo video strategy guide
+- Perfect for: Anyone seeing null and wondering if queries are working
+
 ---
 
-## 📚 Comprehensive Guides
+## Comprehensive Guides
 
 ### [docs/TESTING_BACKEND.md](./TESTING_BACKEND.md)
 
@@ -93,7 +103,7 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### [docs/TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 
@@ -126,7 +136,7 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 📖 Additional Documentation
+## Additional Documentation
 
 ### [docs/deployment_local_guide.md](./deployment_local_guide.md)
 
@@ -156,7 +166,7 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 🎯 Which Guide to Use?
+## Which Guide to Use?
 
 ### Choose based on your goal:
 
@@ -171,7 +181,7 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 📋 Testing Workflow
+## Testing Workflow
 
 **Recommended sequence for new users:**
 
@@ -188,14 +198,14 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ## 🔄 Documentation Status
 
-| Document                  | Status      | Last Updated | Lines |
-| ------------------------- | ----------- | ------------ | ----- |
-| TEST_THIS_NOW.md          | ✅ Complete | Nov 2024     | 150+  |
-| QUICK_TEST.md             | ✅ Complete | Nov 2024     | 400+  |
-| TESTING_BACKEND.md        | ✅ Complete | Nov 2024     | 400+  |
-| GRAPHQL_GUIDE.md          | ✅ Complete | Nov 2024     | 500+  |
-| TROUBLESHOOTING.md        | ✅ Complete | Nov 2024     | 300+  |
-| deployment_local_guide.md | ✅ Archived | Nov 2024     | 200+  |
+| Document                  | Status   | Last Updated | Lines |
+| ------------------------- | -------- | ------------ | ----- |
+| TEST_THIS_NOW.md          | Complete | Nov 2024     | 150+  |
+| QUICK_TEST.md             | Complete | Nov 2024     | 400+  |
+| TESTING_BACKEND.md        | Complete | Nov 2024     | 400+  |
+| GRAPHQL_GUIDE.md          | Complete | Nov 2024     | 500+  |
+| TROUBLESHOOTING.md        | Complete | Nov 2024     | 300+  |
+| deployment_local_guide.md | Archived | Nov 2024     | 200+  |
 
 **Total documentation:** ~2000 lines
 
@@ -229,7 +239,7 @@ Complete guide to all testing documentation for the Linot card game backend.
 
 ---
 
-## 💡 Quick Reference
+## Quick Reference
 
 ### Essential Commands
 
@@ -290,11 +300,11 @@ Found an issue with documentation?
 
 All guides are written in **Markdown** and can be:
 
-- ✅ Read on GitHub with formatting
-- ✅ Read in VS Code with preview
-- ✅ Converted to PDF with any Markdown-to-PDF tool
-- ✅ Printed as reference sheets
-- ✅ Embedded in wikis or documentation sites
+- Read on GitHub with formatting
+- Read in VS Code with preview
+- Converted to PDF with any Markdown-to-PDF tool
+- Printed as reference sheets
+- Embedded in wikis or documentation sites
 
 ---
 

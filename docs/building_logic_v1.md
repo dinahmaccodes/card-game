@@ -93,28 +93,28 @@ fn is_valid_play(player_card, top_card, active_demand) -> bool {
 
 | Scenario | V1 Behavior |
 |----------|-------------|
-| Whot played on Whot | ✅ Allowed - new shape demand overwrites old |
-| Pick Two stacking | ❌ NOT in V1 - save for Wave 2 |
-| Empty deck mid-game | ✅ Reshuffle discard pile (except top card) |
-| Invalid card index | ❌ Panic with error message |
-| Playing out of turn | ❌ Panic with "Not your turn" |
+| Whot played on Whot |  Allowed - new shape demand overwrites old |
+| Pick Two stacking |  NOT in V1 - save for Wave 2 |
+| Empty deck mid-game |  Reshuffle discard pile (except top card) |
+| Invalid card index |  Panic with error message |
+| Playing out of turn |  Panic with "Not your turn" |
 
 **Key Insight**: Check active demand BEFORE checking top card match.
 
 ---
 
-## **⚡ Special Card Effects (V1 - Simplified)**
+## ** Special Card Effects (V1 - Simplified)**
 
 ### **Special Cards Reference Table**
 
 | Card | Number | Effect | Turn Advancement | V1 Implementation |
 |------|--------|--------|------------------|-------------------|
-| **Whot** | - | Player chooses new shape | Normal (advances to next player) | ✅ Required for operation |
-| **Hold On** | 1 | Current player plays again | Same player gets another turn | ✅ Simple turn skip |
-| **Pick Two** | 2 | Next player draws 2 cards | Skip next player's turn | ✅ Simple draw + skip |
-| **Pick Three** | 5 | Next player draws 3 cards | Skip next player's turn | ✅ Simple draw + skip |
-| **Suspension** | 8 | Next player loses their turn | Skip next player | ✅ Just advance by 2 |
-| **General Market** | 14 | All other players draw 1 | Normal advancement | ✅ Loop through opponents |
+| **Whot** | - | Player chooses new shape | Normal (advances to next player) |  Required for operation |
+| **Hold On** | 1 | Current player plays again | Same player gets another turn |  Simple turn skip |
+| **Pick Two** | 2 | Next player draws 2 cards | Skip next player's turn |  Simple draw + skip |
+| **Pick Three** | 5 | Next player draws 3 cards | Skip next player's turn |  Simple draw + skip |
+| **Suspension** | 8 | Next player loses their turn | Skip next player |  Just advance by 2 |
+| **General Market** | 14 | All other players draw 1 | Normal advancement |  Loop through opponents |
 
 ### **V1 Special Card Logic (Simple Version)**
 
@@ -280,22 +280,22 @@ fn handle_forfeit(leaving_player, state) {
 ```rust
 // Every state-changing operation MUST verify:
 
-✅ DO: Authenticate caller
+ DO: Authenticate caller
    let caller = runtime.authenticated_signer()?;
 
-✅ DO: Verify turn ownership
+ DO: Verify turn ownership
    if state.current_player != caller { panic!("Not your turn"); }
 
-✅ DO: Validate card ownership
+ DO: Validate card ownership
    if !player.hand.contains(card) { panic!("Card not in hand"); }
 
-✅ DO: Validate game rules
+ DO: Validate game rules
    if !is_valid_play(card, top_card) { panic!("Invalid move"); }
 
-❌ DON'T: Trust client-provided indices
+ DON'T: Trust client-provided indices
    Verify card_index < player.hand.len()
 
-❌ DON'T: Expose full hands in queries
+ DON'T: Expose full hands in queries
    Filter in service layer based on requester
 ```
 
@@ -383,7 +383,7 @@ fn player_view(my_account: String) -> PlayerView {
 
 ---
 
-## **🎬 Operation Sequencing (Phase 9)**
+## ** Operation Sequencing (Phase 9)**
 
 ### **V1 Match Lifecycle**
 
@@ -444,7 +444,7 @@ fn player_view(my_account: String) -> PlayerView {
 
 ---
 
-## **🚀 V1 Build Sequence (Minimal Playable Game)**
+## ** V1 Build Sequence (Minimal Playable Game)**
 
 ### **Step 1: Foundation (Week 1)**
 
@@ -588,25 +588,25 @@ TEST: Can game handle all edge cases without crashing?
 
 ---
 
-## **✅ V1 Definition of Done**
+## ** V1 Definition of Done**
 
 ```
 A V1 match is complete when:
-✅ 2 players can join a match
-✅ Host can start the match
-✅ Players take turns playing cards
-✅ Card validation works (shape/number matching)
-✅ All 6 special cards work correctly
-✅ Win condition detected (empty hand)
-✅ Game state persists between operations
-✅ GraphQL queries return correct filtered views
-✅ Can be played via GraphiQL (or simple frontend)
-✅ Game never crashes (all errors handled gracefully)
+ 2 players can join a match
+ Host can start the match
+ Players take turns playing cards
+ Card validation works (shape/number matching)
+ All 6 special cards work correctly
+ Win condition detected (empty hand)
+ Game state persists between operations
+ GraphQL queries return correct filtered views
+ Can be played via GraphiQL (or simple frontend)
+ Game never crashes (all errors handled gracefully)
 ```
 
 ---
 
-## **📋 Development Checklist**
+## ** Development Checklist**
 
 ```
 Week 1:
@@ -640,7 +640,7 @@ Week 4:
 □ Forfeit handling
 □ Error messages polished
 □ Deployed to testnet
-□ V1 COMPLETE ✅
+□ V1 COMPLETE 
 ```
 
 ---

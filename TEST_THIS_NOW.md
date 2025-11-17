@@ -1,4 +1,4 @@
-# ⚡ Test Linot Backend NOW (10 minutes)
+# Test Linot Backend NOW (10 minutes)
 
 Quick testing checklist for the Linot card game backend on Linera.
 
@@ -81,28 +81,52 @@ linera service --port 8080
 CHAIN_ID="YOUR_CHAIN_ID_HERE"  # Replace with actual ID Numbers
 APP_ID="YOUR_APP_ID_HERE"      # Replace with actual ID Numbers
 
+APP_ID="86e143565c7f3d62f5aa2986d6652cdebaed56559911cdd53836ef5c159f9903"
+CHAIN_ID="eb4641a185be8977c034b69f4fb2e80cb91c81e5a6275e2a85f763777444719f"
+
 curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
   -H "Content-Type: application/json" \
   -d '{"query": "query { status }"}'
 
-# Expected output: {"data":{"status":"WAITING"}}
+# Expected: {"data":{"status":"WAITING"}}
 
 curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
   -H "Content-Type: application/json" \
   -d '{"query": "query { config { maxPlayers isRanked strictMode } }"}'
 
-# Expected output: {"data":{"config":{"maxPlayers":2,"isRanked":false,"strictMode":false}}}
+# Expected: {"data":{"config":{"maxPlayers":2,"isRanked":false,"strictMode":false}}}
+
+curl -X POST "http://localhost:8080/chains/${CHAIN_ID}/applications/${APP_ID}" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { currentPlayer currentPlayerIndex }"}'
+
+# Expected: {"data":{"currentPlayer":null,"currentPlayerIndex":0}}
+# Note: null is CORRECT - no players joined yet. Query is working!
 ```
 
-### Step 5b: Test via Browser (2 min)
+**Understanding null responses:**
+
+- `null` = Query working, no data yet (no players joined)
+- `0` = Initial value (deck not shuffled)
+- Broken queries return `{"errors":[...]}`, not `{"data":{...}}`
+
+```
+
+### Step 5b: Test via Browser (2 min) - Visual Test with GraphQL
 
 Open: `http://localhost:8080/chains/YOUR_CHAIN_ID/applications/YOUR_APP_ID`
 
+Open: `http://localhost:8080/chains/eb4641a185be8977c034b69f4fb2e80cb91c81e5a6275e2a85f763777444719f/applications/86e143565c7f3d62f5aa2986d6652cdebaed56559911cdd53836ef5c159f9903`
+
 ```
-# Input the actual details for CHAIN_ID AND APP_ID
-# Example: http://localhost:8080/chains/d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de/applications/9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
+
+### Input the actual details for CHAIN_ID AND APP_ID
+
+### Example: http://localhost:8080/chains/d228a627388a5e78a6d3ec13732e32449817bcefdaf94a52404edfd2cb8a18de/applications/9aebcaf6388679681080dd8fc710db4d43429a0040417fe852958d9965f698ea
+
 In GraphiQL (left panel), type:
-```
+
+````
 
 ```graphql
 query {
@@ -112,7 +136,7 @@ query {
     strictMode
   }
 }
-```
+````
 
 Click pink Play button ▶
 
