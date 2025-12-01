@@ -5,9 +5,10 @@
 This is a **Linera blockchain smart contract** implementing a two-player Whot/Linot card game (PvP). The game is fully on-chain, using Linera's microchains architecture for fast, scalable gameplay.
 
 **Game Type:** Turn-based card game (Nigerian Whot rules)  
-**Players:** 2 players (V1 implementation)  
-**Blockchain:** Linera Protocol SDK v0.15.4  
-**Language:** Rust (compiled to WASM)
+**Players:** 2-4 players  
+**Blockchain:** Linera Protocol SDK v0.15.5  
+**Language:** Rust (compiled to WASM)  
+**Build Output:** 264KB contract.wasm + 1.4MB service.wasm
 
 ---
 

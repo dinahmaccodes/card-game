@@ -9,11 +9,12 @@ use linera_sdk::{
 use std::sync::Arc;
 
 use crate::state::{LinotState, MatchConfig, MatchData, MatchStatus};
-use linot::{Card, CardSuit, LinotAbi};
+use linot::{Card, CardSuit, LinotAbi, Operation};
 
 /// GraphQL service for querying Linot match state
 pub struct LinotService {
     state: Arc<LinotState>,
+    runtime: Arc<ServiceRuntime<Self>>,
 }
 
 linera_sdk::service!(LinotService);
@@ -31,16 +32,18 @@ impl Service for LinotService {
             .expect("Failed to load state");
         LinotService {
             state: Arc::new(state),
+            runtime: Arc::new(runtime),
         }
     }
 
     async fn handle_query(&self, request: Request) -> Response {
         let schema = Schema::build(
             QueryRoot,
-            async_graphql::EmptyMutation,
+            MutationRoot,
             EmptySubscription,
         )
         .data(self.state.clone())
+        .data(self.runtime.clone())
         .finish();
 
         schema.execute(request).await
@@ -228,3 +231,79 @@ struct PlayerView {
     winner_index: Option<usize>,
 }
 
+// ============ GraphQL Mutation Root ============
+
+/// GraphQL mutation root for game actions
+struct MutationRoot;
+
+#[Object]
+impl MutationRoot {
+    /// Join the match with a nickname
+    async fn join_match(&self, ctx: &Context<'_>, nickname: String) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::JoinMatch { nickname });
+        true
+    }
+
+    /// Start the match (host only)
+    async fn start_match(&self, ctx: &Context<'_>) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::StartMatch);
+        true
+    }
+
+    /// Play a card from your hand
+    async fn play_card(
+        &self,
+        ctx: &Context<'_>,
+        card_index: i32,
+        chosen_suit: Option<String>,
+    ) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        
+        // Convert String to CardSuit if provided
+        let suit = chosen_suit.and_then(|s| match s.to_lowercase().as_str() {
+            "circle" => Some(CardSuit::Circle),
+            "cross" => Some(CardSuit::Cross),
+            "triangle" => Some(CardSuit::Triangle),
+            "square" => Some(CardSuit::Square),
+            _ => None,
+        });
+
+        runtime.schedule_operation(&Operation::PlayCard {
+            card_index: card_index as usize,
+            chosen_suit: suit,
+        });
+        true
+    }
+
+    /// Draw a card from the deck
+    async fn draw_card(&self, ctx: &Context<'_>) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::DrawCard);
+        true
+    }
+
+    /// Call "Last Card" when you have one card remaining
+    async fn call_last_card(&self, ctx: &Context<'_>) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::CallLastCard);
+        true
+    }
+
+    /// Challenge another player for not calling "Last Card"
+    async fn challenge_last_card(&self, ctx: &Context<'_>, player_index: i32) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::ChallengeLastCard {
+            player_index: player_index as usize,
+        });
+        true
+    }
+
+    /// Leave the match
+    async fn leave_match(&self, ctx: &Context<'_>) -> bool {
+        let runtime = ctx.data_unchecked::<Arc<ServiceRuntime<LinotService>>>();
+        runtime.schedule_operation(&Operation::LeaveMatch);
+        true
+    }
+}
