@@ -3,9 +3,9 @@
 set -eu
 
 eval "$(linera net helper)"
-linera_spawn linera net up --with-faucet --faucet-port 8081
+linera_spawn linera net up --with-faucet --faucet-port 8080
 
-export LINERA_FAUCET_URL=http://localhost:8081
+export LINERA_FAUCET_URL=http://localhost:8080
 
 # Remove old wallet to avoid conflicts on container restart
 rm -rf ~/.config/linera
@@ -30,12 +30,12 @@ cat > frontend/.env.local << ENVEOF
 VITE_CHAIN_ID=$CHAIN_ID
 VITE_APP_ID=$APP_ID
 VITE_OWNER_ID=$OWNER_ID
-VITE_GRAPHQL_URL=http://localhost:8080/chains/$CHAIN_ID/applications/$APP_ID
+VITE_GRAPHQL_URL=http://localhost:8081/chains/$CHAIN_ID/applications/$APP_ID
 VITE_CHAIN_GRAPHQL_URL=http://localhost:8080
-VITE_FAUCET_URL=http://localhost:8081
+VITE_FAUCET_URL=http://localhost:8080
 ENVEOF
 
-linera service --port 8080 &
+linera service --port 8081 &
 
 # Build and run your frontend, if any
 # Source NVM to make npm available

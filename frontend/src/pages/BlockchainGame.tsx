@@ -13,7 +13,6 @@ export default function BlockchainGame() {
     fetchGameState,
     joinMatch,
     startMatch,
-    playCard,
     drawCard,
     callLastCard,
     startPolling,
@@ -28,6 +27,7 @@ export default function BlockchainGame() {
     return () => {
       stopPolling();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle join match
@@ -41,13 +41,6 @@ export default function BlockchainGame() {
   // Handle start match
   const handleStart = async () => {
     await startMatch();
-  };
-
-  // Handle play card
-  const handlePlayCard = async (cardIndex: number) => {
-    // Check if it's a Whot card (wild card) - would need suit selection
-    // For now, just play the card
-    await playCard(cardIndex);
   };
 
   // Handle draw card
@@ -200,9 +193,7 @@ export default function BlockchainGame() {
             <li>2. Click "Start Match" when ready</li>
             <li>3. Play cards or draw from the deck</li>
             <li>4. Call "Last Card" when you have one card left</li>
-            <li>
-              5. Game state updates automatically via blockchain polling
-            </li>
+            <li>5. Game state updates automatically via blockchain polling</li>
           </ol>
         </div>
       </div>

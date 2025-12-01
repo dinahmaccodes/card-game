@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { lineraClient } from "../lib/lineraClient";
-import type { GameState, Card } from "../lib/lineraClient";
+import type { GameState } from "../lib/lineraClient";
 import toast from "react-hot-toast";
 
 interface BlockchainGameStore {
@@ -24,7 +24,7 @@ interface BlockchainGameStore {
   stopPolling: () => void;
 }
 
-let pollingInterval: NodeJS.Timeout | null = null;
+let pollingInterval: number | null = null;
 
 export const useBlockchainGameStore = create<BlockchainGameStore>(
   (set, get) => ({
@@ -166,9 +166,7 @@ export const useBlockchainGameStore = create<BlockchainGameStore>(
         toast.success("🎴 Last Card called!");
       } catch (error) {
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Failed to call last card";
+          error instanceof Error ? error.message : "Failed to call last card";
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);
       }

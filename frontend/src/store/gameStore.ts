@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { GameState, Player} from "../types/game";
+import type { GameState, Player } from "../types/game";
 import {
   createDeck,
   dealCards,
@@ -14,12 +14,13 @@ import {
   reshuffleDiscardPile,
 } from "../lib/gameLogic";
 import toast from "react-hot-toast";
+import { lineraClient } from "../lib/lineraClient";
 
 interface GameStore extends GameState {
   // Actions
-  startNewGame: () => void;
-  playCard: (cardId: string, playerId: string) => void;
-  drawCard: (playerId: string) => void;
+  startNewGame: () => Promise<void>;
+  playCard: (cardId: string, playerId: string) => Promise<void>;
+  drawCard: (playerId: string) => Promise<void>;
   resetGame: () => void;
   computerPlay: () => void;
   endTurn: () => void;
@@ -49,7 +50,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   awaitingSuspensionCard: false,
 
   // Actions
-  startNewGame: () => {
+  startNewGame: async () => {
     const deck = createDeck();
     const players = initialPlayers.map((player) => ({ ...player, hand: [] }));
     const remainingDeck = dealCards(deck, players, 5);
@@ -74,10 +75,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       awaitingSuspensionCard: false,
     });
 
-    toast.success("New game started! You go first.");
+    // Blockchain integration: Join and start match
+    try {
+      console.log("🔗 Joining match on blockchain...");
+      await lineraClient.joinMatch("Player");
+      console.log("✅ Joined! Waiting for block confirmation...");
+
+      // Wait for the join block to be processed before starting
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      console.log("🔗 Starting match on blockchain...");
+      await lineraClient.startMatch();
+
+      toast.success("New game started! Synced to blockchain ⛓️");
+    } catch (error) {
+      console.warn("⚠️ Blockchain sync failed (playing locally):", error);
+      toast.success("New game started! You go first.");
+    }
   },
 
-  playCard: (cardId: string, playerId: string) => {
+  playCard: async (cardId: string, playerId: string) => {
     const state = get();
     const player = state.players.find((p) => p.id === playerId);
 
@@ -144,6 +161,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           color: "#fff",
         },
       });
+
+      // Blockchain integration: Log the winning move
+      if (playerId === "player") {
+        try {
+          console.log("🔗 Logging winning move to blockchain...");
+          await lineraClient.playCard(cardIndex);
+        } catch (error) {
+          console.warn("⚠️ Blockchain sync failed:", error);
+        }
+      }
+
       return;
     }
 
@@ -244,9 +272,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // SUSPENSION (8) - Player plays again with normal matching rules
     if (card.number === 8) {
-      const nextPlayer = state.players[
-        getNextPlayerIndex(state.currentPlayerIndex, state.players.length, state.turnDirection)
-      ];
+      const nextPlayer =
+        state.players[
+          getNextPlayerIndex(
+            state.currentPlayerIndex,
+            state.players.length,
+            state.turnDirection
+          )
+        ];
 
       toast(`⏸️ ${nextPlayer.name} suspended! Play again.`, {
         duration: 2000,
@@ -371,6 +404,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       canEndTurn: false,
     });
 
+    // Blockchain integration: Track human player's moves
+    if (playerId === "player") {
+      try {
+        console.log(
+          `🔗 Syncing card play to blockchain: ${card.suit} ${card.number}`
+        );
+        await lineraClient.playCard(cardIndex);
+        console.log("✅ Card play synced to blockchain");
+      } catch (error) {
+        console.warn("⚠️ Blockchain sync failed (continuing locally):", error);
+      }
+    }
+
     // If it's computer's turn, play automatically
     if (updatedPlayers[nextPlayerIndex].isComputer) {
       setTimeout(() => {
@@ -379,7 +425,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  drawCard: (playerId: string) => {
+  drawCard: async (playerId: string) => {
     const state = get();
     const player = state.players.find((p) => p.id === playerId);
 
@@ -405,7 +451,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       currentDeck = newDeck;
       currentDiscardPile = newDiscardPile;
-      
+
       if (currentDeck.length > 0) {
         toast("♻️ Deck reshuffled!", { duration: 2000 });
       }
@@ -525,6 +571,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       canEndTurn: false,
     });
 
+    // Blockchain integration: Track human player's draw
+    if (playerId === "player") {
+      try {
+        console.log("🔗 Syncing card draw to blockchain...");
+        await lineraClient.drawCard();
+        console.log("✅ Card draw synced to blockchain");
+      } catch (error) {
+        console.warn("⚠️ Blockchain sync failed (continuing locally):", error);
+      }
+    }
+
     // If it's computer's turn, play automatically
     if (updatedPlayers[nextPlayerIndex].isComputer) {
       setTimeout(() => {
@@ -546,7 +603,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (move.action === "play" && move.cardId) {
       const card = computer.hand.find((c) => c.id === move.cardId);
-      
+
       // Play the card
       get().playCard(move.cardId, computer.id);
 
@@ -554,11 +611,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (card?.suit === "whot" && move.chosenShape) {
         setTimeout(() => {
           get().setWhotShapeDemand(move.chosenShape!);
-          
+
           // Format shape name nicely
-          const shapeName = move.chosenShape!.charAt(0).toUpperCase() + 
-                           move.chosenShape!.slice(1);
-          
+          const shapeName =
+            move.chosenShape!.charAt(0).toUpperCase() +
+            move.chosenShape!.slice(1);
+
           toast.success(`Computer demands: ${shapeName}!`, {
             duration: 3000,
             icon: "🤖",
@@ -586,7 +644,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   endTurn: () => {
     const state = get();
-    
+
     // Player must have played or drawn before ending turn
     if (!state.canEndTurn || state.gameStatus !== "playing") {
       toast.error("You must play a card or draw before ending turn!");
@@ -614,9 +672,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setWhotShapeDemand: (shape: string) => {
     const state = get();
-    
-    set({ 
-      whotShapeDemand: shape 
+
+    set({
+      whotShapeDemand: shape,
     });
 
     // After setting Whot shape, move to next player if it was player's turn
@@ -643,7 +701,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resetGame: () => {
     set({
-      players: initialPlayers.map(p => ({ ...p, hand: [] })),
+      players: initialPlayers.map((p) => ({ ...p, hand: [] })),
       currentPlayerIndex: 0,
       deck: [],
       discardPile: [],

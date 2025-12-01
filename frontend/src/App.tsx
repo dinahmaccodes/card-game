@@ -10,8 +10,8 @@ function App() {
   );
   const { startNewGame } = useGameStore();
 
-  const handleStartGame = () => {
-    startNewGame();
+  const handleStartGame = async () => {
+    await startNewGame();
     setCurrentPage("game");
   };
 

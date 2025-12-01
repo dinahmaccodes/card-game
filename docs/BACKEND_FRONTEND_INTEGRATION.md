@@ -7,12 +7,14 @@ This document explains the changes made to connect the Linot frontend to the blo
 ## Problem
 
 The frontend was running a **complete local game simulation** using Zustand state management. It had:
+
 - Local deck shuffling
 - Local card validation
 - Local turn management
 - **Zero connection to the blockchain backend**
 
 This meant:
+
 - Games weren't stored on-chain
 - Multiplayer didn't work
 - No blockchain benefits (persistence, verifiability, etc.)
@@ -39,6 +41,7 @@ impl MutationRoot {
 ```
 
 **How it works:**
+
 - Each mutation calls `runtime.schedule_operation()` to trigger blockchain operations
 - Operations are defined in `contract.rs` (JoinMatch, StartMatch, PlayCard, etc.)
 - State is persisted on-chain automatically
@@ -49,17 +52,18 @@ impl MutationRoot {
 
 ```typescript
 class LineraClient {
-  async joinMatch(nickname: string): Promise<boolean>
-  async startMatch(): Promise<boolean>
-  async playCard(cardIndex: number, chosenSuit?: string): Promise<boolean>
-  async drawCard(): Promise<boolean>
-  async callLastCard(): Promise<boolean>
-  async challengeLastCard(playerIndex: number): Promise<boolean>
-  async leaveMatch(): Promise<boolean>
+  async joinMatch(nickname: string): Promise<boolean>;
+  async startMatch(): Promise<boolean>;
+  async playCard(cardIndex: number, chosenSuit?: string): Promise<boolean>;
+  async drawCard(): Promise<boolean>;
+  async callLastCard(): Promise<boolean>;
+  async challengeLastCard(playerIndex: number): Promise<boolean>;
+  async leaveMatch(): Promise<boolean>;
 }
 ```
 
 **How it works:**
+
 - Simple fetch-based GraphQL client
 - Sends POST requests with GraphQL mutations
 - Error handling with meaningful messages
@@ -71,22 +75,23 @@ class LineraClient {
 
 ```typescript
 interface BlockchainGameStore {
-  gameState: GameState | null
-  isLoading: boolean
-  error: string | null
-  
-  fetchGameState(): Promise<void>
-  joinMatch(nickname: string): Promise<void>
-  startMatch(): Promise<void>
-  playCard(cardIndex: number, chosenSuit?: string): Promise<void>
-  drawCard(): Promise<void>
-  callLastCard(): Promise<void>
-  startPolling(): void
-  stopPolling(): void
+  gameState: GameState | null;
+  isLoading: boolean;
+  error: string | null;
+
+  fetchGameState(): Promise<void>;
+  joinMatch(nickname: string): Promise<void>;
+  startMatch(): Promise<void>;
+  playCard(cardIndex: number, chosenSuit?: string): Promise<void>;
+  drawCard(): Promise<void>;
+  callLastCard(): Promise<void>;
+  startPolling(): void;
+  stopPolling(): void;
 }
 ```
 
 **Key features:**
+
 - Fetches state from blockchain via GraphQL
 - Polls every 2 seconds for real-time updates
 - Integrates with react-hot-toast for user feedback
@@ -106,12 +111,14 @@ interface BlockchainGameStore {
 ### Backend (3 files)
 
 1. **`backend/src/service.rs`** ✅
+
    - Added `runtime: Arc<ServiceRuntime<Self>>` to LinotService
    - Replaced `EmptyMutation` with `MutationRoot`
    - Added `.data(self.runtime.clone())` to schema builder
    - Implemented 7 mutation methods
 
 2. **`run.bash`** ✅
+
    - Fixed `VITE_GRAPHQL_URL` to include chain/app IDs
    - Added `VITE_CHAIN_GRAPHQL_URL` for chain queries
 
@@ -121,12 +128,14 @@ interface BlockchainGameStore {
 ### Frontend (3 new files)
 
 4. **`frontend/src/lib/lineraClient.ts`** ✅
+
    - Created GraphQL client class
    - Implemented all query methods
    - Implemented all mutation methods
    - Type-safe with proper error handling
 
 5. **`frontend/src/store/blockchainGameStore.ts`** ✅
+
    - NEW blockchain-integrated state management
    - Replaces local Zustand gameStore
    - Polls blockchain every 2 seconds
@@ -141,6 +150,7 @@ interface BlockchainGameStore {
 ### Documentation (2 files)
 
 7. **`docs/GRAPHQL_FIX.md`** ✅
+
    - Explains the two-endpoint architecture
    - Documents the root cause analysis
    - Shows correct vs incorrect query patterns
@@ -155,8 +165,9 @@ interface BlockchainGameStore {
 ### Game Flow
 
 1. **Join Match**
+
    ```
-   User clicks "Join Match" 
+   User clicks "Join Match"
    → Frontend calls lineraClient.joinMatch("Alice")
    → GraphQL mutation sent to backend
    → service.rs schedules Operation::JoinMatch
@@ -166,6 +177,7 @@ interface BlockchainGameStore {
    ```
 
 2. **Start Match**
+
    ```
    User clicks "Start Match"
    → Frontend calls lineraClient.startMatch()
@@ -187,12 +199,14 @@ interface BlockchainGameStore {
 
 ### State Synchronization
 
-**Before:** 
+**Before:**
+
 - Frontend had complete game state locally
 - No blockchain interaction
 - Games lost on page refresh
 
 **After:**
+
 - Backend is source of truth
 - Frontend polls every 2 seconds
 - State persists on blockchain
@@ -200,16 +214,16 @@ interface BlockchainGameStore {
 
 ## Comparison: Old vs New
 
-| Feature | Old (Local) | New (Blockchain) |
-|---------|------------|------------------|
-| **State Storage** | Browser memory | Linera blockchain |
-| **Persistence** | Lost on refresh | Permanent on-chain |
-| **Multiplayer** | Impossible | Native support |
-| **Validation** | Client-side only | Enforced by contract |
-| **Card dealing** | Random (frontend) | Verifiable (backend) |
-| **Cheating** | Possible | Impossible |
-| **Latency** | Instant | ~1 second |
-| **Complexity** | 664 lines gameStore | 200 lines blockchainStore |
+| Feature           | Old (Local)         | New (Blockchain)          |
+| ----------------- | ------------------- | ------------------------- |
+| **State Storage** | Browser memory      | Linera blockchain         |
+| **Persistence**   | Lost on refresh     | Permanent on-chain        |
+| **Multiplayer**   | Impossible          | Native support            |
+| **Validation**    | Client-side only    | Enforced by contract      |
+| **Card dealing**  | Random (frontend)   | Verifiable (backend)      |
+| **Cheating**      | Possible            | Impossible                |
+| **Latency**       | Instant             | ~1 second                 |
+| **Complexity**    | 664 lines gameStore | 200 lines blockchainStore |
 
 ## Testing the Integration
 
@@ -227,6 +241,7 @@ sudo docker compose up --build
 ```
 
 Expected output:
+
 ```
 ✅ Endpoint is accessible
 ✅ Status query successful!
@@ -244,6 +259,7 @@ Expected output:
 **To use blockchain game:**
 
 Update `frontend/src/App.tsx`:
+
 ```tsx
 import BlockchainGame from "./pages/BlockchainGame";
 
@@ -267,18 +283,21 @@ export default App;
 ### lineraodds-main (Vue + Apollo + @linera/client)
 
 **Their approach:**
+
 - Uses @linera/client library for wallet management
 - Apollo Client for advanced caching
 - Vue.js reactive system
 - Separate services on different ports
 
 **Our approach:**
+
 - Simple fetch-based client (no extra deps)
 - React hooks + Zustand
 - Single service on port 8080
 - Simpler, more transparent
 
 **Why ours is better for this project:**
+
 - Easier for judges to understand
 - No wallet setup required during demo
 - Fully self-contained in Docker
@@ -287,22 +306,27 @@ export default App;
 ## Current Limitations
 
 ### 1. No Player Hand Visualization
+
 - BlockchainGame.tsx shows game state but not individual cards
 - Need to add player view query and card rendering
 
 ### 2. No Card Selection UI
+
 - Currently no way to select which card to play
 - Need card hand component with click handlers
 
 ### 3. No Whot Card Suit Selection
+
 - Whot cards need suit picker dialog
 - Currently just passes undefined
 
 ### 4. No Computer Opponent
+
 - Old gameStore had AI logic
 - Need to implement bot in contract or frontend
 
 ### 5. Polling Delay
+
 - 2 second polling means ~2s lag
 - Could implement WebSocket subscriptions for real-time
 
@@ -311,18 +335,21 @@ export default App;
 ### Immediate (Critical for Demo)
 
 1. **Update App.tsx to use BlockchainGame**
+
    ```tsx
    import BlockchainGame from "./pages/BlockchainGame";
    // Replace Dashboard/Game with BlockchainGame
    ```
 
 2. **Add Player Hand Query**
+
    ```typescript
    // In lineraClient.ts
    async getPlayerView(owner: string): Promise<PlayerView>
    ```
 
 3. **Create Card Hand Component**
+
    ```tsx
    // frontend/src/components/CardHand.tsx
    // Shows player's cards with click handlers
@@ -337,14 +364,17 @@ export default App;
 ### Medium Priority (Better UX)
 
 5. **Add Loading Indicators**
+
    - Show spinner during mutations
    - Disable buttons during loading
 
 6. **Better Error Messages**
+
    - Parse GraphQL errors
    - Show user-friendly messages
 
 7. **Optimistic Updates**
+
    - Update UI immediately
    - Rollback if mutation fails
 
@@ -355,10 +385,12 @@ export default App;
 ### Optional (Polish)
 
 9. **Card Animations**
+
    - Framer Motion transitions
    - Card flip effects
 
 10. **Sound Effects**
+
     - Card play sounds
     - Win/lose audio
 
@@ -375,13 +407,13 @@ export default App;
 ✅ **State persistence** - Games survive page refresh  
 ✅ **Cheat-proof** - Contract validates everything  
 ✅ **Simpler frontend** - No complex local game logic  
-✅ **Real blockchain demo** - Shows actual Linera features  
+✅ **Real blockchain demo** - Shows actual Linera features
 
 ### What We Lost
 
 ❌ **Instant feedback** - ~1s latency vs immediate  
 ❌ **Offline play** - Requires running blockchain  
-❌ **Complex AI** - Computer player needs backend implementation  
+❌ **Complex AI** - Computer player needs backend implementation
 
 ### Net Result
 
@@ -390,16 +422,19 @@ export default App;
 ## Summary
 
 **Before:**
+
 - Frontend: Full game simulation (664 lines)
 - Backend: Just queries, no mutations
 - Connection: None
 
 **After:**
+
 - Frontend: UI + GraphQL client (200 lines)
 - Backend: Full game logic + GraphQL API
 - Connection: Real-time polling every 2s
 
 **Result:**
+
 - Actual blockchain gameplay ✅
 - Multiplayer capable ✅
 - Judges can test real features ✅
