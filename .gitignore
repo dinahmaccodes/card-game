@@ -3,32 +3,12 @@
 /target/
 # Ignore backend target specifically
 /backend/target/
-
+/inspo-codes
 ### Linera Protocol Source (not needed for demo)
 /linera-protocol/
 
-### Internal/Development Documentation (not for judges)
-# Wave 2 internal tracking files
-DEPLOYMENT_GUIDE.md
-GRAPHQL_API.md
-WAVE2_CHECKLIST.md
-WAVE2_SUMMARY.md
-
-# Old/redundant documentation
-/docs/building_logic_v1.md
-/docs/WAVE2_IMPROVEMENTS.md
-/docs/IMPLEMENTATION_SUMMARY.md
-/docs/CONTRACT_BUILD_GUIDE.md
-/docs/demo_present_sample.md
-/docs/code.md
-/docs/building_logic_v1.md
-/docs/backend_starting_phase.md
-/docs/backend_whot_format.md
-/docs/backend_whot_rules.md
-/docs/getting_statrted.md
-/docs/deployment_local_guide.md
-/docs/technical_architecture.md
-/docs/details.md
+### Previous Waves Archive (not for judges)
+/docs/previous-waves/
 
 # Template folder (unused)
 /template/
