@@ -141,7 +141,7 @@ impl LinotContract {
     /// Handle player joining the match
     async fn handle_join_match(&mut self, caller: AccountOwner, nickname: String) -> Result<(), LinotError> {
         let mut match_data = self.state.match_data.get().clone();
-        let config = self.state.config.get().clone();
+        let mut config = self.state.config.get().clone();
 
         // Validate: match must be waiting
         if match_data.status != MatchStatus::Waiting {
@@ -158,6 +158,12 @@ impl LinotContract {
             return Err(LinotError::PlayerAlreadyJoined);
         }
 
+        // Make first player the host (for single-player demo)
+        if match_data.players.is_empty() {
+            config.host = Some(caller);
+            self.state.config.set(config);
+        }
+
         // Add player
         match_data.players.push(Player::new(caller, nickname));
         self.state.match_data.set(match_data);
@@ -167,21 +173,17 @@ impl LinotContract {
 
     /// Handle starting the match
     async fn handle_start_match(&mut self, caller: AccountOwner) -> Result<(), LinotError> {
-        let config = self.state.config.get().clone();
         let mut match_data = self.state.match_data.get().clone();
 
-        // Validate: only host can start
-        if let Some(host) = &config.host {
-            if caller != *host {
-                return Err(LinotError::OnlyHostCanStart);
-            }
-        } else {
+        // Validate: caller must be a player
+        if !match_data.players.iter().any(|p| p.owner == caller) {
             return Err(LinotError::OnlyHostCanStart);
         }
 
-        // Validate: enough players (2 for V1)
-        if match_data.players.len() < 2 {
-            return Err(LinotError::NotEnoughPlayers(2));
+        // For single-player demo: Allow starting with just 1 player (you vs local AI)
+        // In multiplayer, this would require 2+ players
+        if match_data.players.is_empty() {
+            return Err(LinotError::NotEnoughPlayers(1));
         }
 
         // Validate: match is waiting

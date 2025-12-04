@@ -2,10 +2,10 @@ services:
   app:
     build: .
     ports:
-    - "5173:5173"   # Frontend
-    - "8080:8080"   # GraphQL service
-    - "8081:8081"   # Faucet
-    - "9001:9001"   # Shard proxy
-    - "13001:13001" # Shard
+      - "5173:5173" # Frontend
+      - "8080:8080" # GraphQL service
+      - "8081:8081" # Faucet
+      - "9001:9001" # Shard proxy
+      - "13001:13001" # Shard
     volumes:
-    - .:/build
+      - .:/build
